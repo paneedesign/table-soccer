@@ -1,0 +1,204 @@
+{
+  "games": [
+    {
+      "DefenderA": "Umberto",
+      "StrikerA": "Vittorio",
+      "DefenderB": "Stefano",
+      "StrikerB": "Dario",
+      "ResultA": 12,
+      "ResultB": 10
+    },
+    {
+      "DefenderA": "Patrick",
+      "StrikerA": "Carmelo",
+      "DefenderB": "Domenico",
+      "StrikerB": "Mirko",
+      "ResultA": 10,
+      "ResultB": 5
+    },
+    {
+      "DefenderA": "Stefano",
+      "StrikerA": "Dario",
+      "DefenderB": "Domenico",
+      "StrikerB": "Carmelo",
+      "ResultA": 6,
+      "ResultB": 10
+    },
+    {
+      "DefenderA": "Umberto",
+      "StrikerA": "Dario",
+      "DefenderB": "Patrick",
+      "StrikerB": "Carmelo",
+      "ResultA": 4,
+      "ResultB": 10
+    },
+    {
+      "DefenderA": "Patrick",
+      "StrikerA": "Carmelo",
+      "DefenderB": "Domenico",
+      "StrikerB": "Vittorio",
+      "ResultA": 7,
+      "ResultB": 10
+    },
+    {
+      "DefenderA": "Patrick",
+      "StrikerA": "Carmelo",
+      "DefenderB": "Domenico",
+      "StrikerB": "Vittorio",
+      "ResultA": 5,
+      "ResultB": 10
+    },
+    {
+      "DefenderA": "Patrick",
+      "StrikerA": "Carmelo",
+      "DefenderB": "Vittorio",
+      "StrikerB": "Dario",
+      "ResultA": 10,
+      "ResultB": 7
+    },
+    {
+      "DefenderA": "Patrick",
+      "StrikerA": "Carmelo",
+      "DefenderB": "Domenico",
+      "StrikerB": "Dario",
+      "ResultA": 10,
+      "ResultB": 6
+    },
+    {
+      "DefenderA": "Stefano",
+      "StrikerA": "Vittorio",
+      "DefenderB": "Patrick",
+      "StrikerB": "Carmelo",
+      "ResultA": 12,
+      "ResultB": 10
+    },
+    {
+      "DefenderA": "Stefano",
+      "StrikerA": "Vittorio",
+      "DefenderB": "Domenico",
+      "StrikerB": "Carmelo",
+      "ResultA": 10,
+      "ResultB": 4
+    },
+    {
+      "DefenderA": "Patrick",
+      "StrikerA": "Vittorio",
+      "DefenderB": "Stefano",
+      "StrikerB": "Dario",
+      "ResultA": 8,
+      "ResultB": 10
+    },
+    {
+      "DefenderA": "Patrick",
+      "StrikerA": "Vittorio",
+      "DefenderB": "Domenico",
+      "StrikerB": "Carmelo",
+      "ResultA": 7,
+      "ResultB": 10
+    },
+    {
+      "DefenderA": "Domenico",
+      "StrikerA": "Mirko",
+      "DefenderB": "Patrick",
+      "StrikerB": "Carmelo",
+      "ResultA": 10,
+      "ResultB": 5
+    },
+    {
+      "DefenderA": "Stefano",
+      "StrikerA": "Vittorio",
+      "DefenderB": "Patrick",
+      "StrikerB": "Carmelo",
+      "ResultA": 10,
+      "ResultB": 5
+    },
+    {
+      "DefenderA": "Domenico",
+      "StrikerA": "Vittorio",
+      "DefenderB": "Stefano",
+      "StrikerB": "Dario",
+      "ResultA": 10,
+      "ResultB": 5
+    },
+    {
+      "DefenderA": "Domenico",
+      "StrikerA": "Carmelo",
+      "DefenderB": "Patrick",
+      "StrikerB": "Dario",
+      "ResultA": 10,
+      "ResultB": 4
+    },
+    {
+      "DefenderA": "Domenico",
+      "StrikerA": "Mirko",
+      "DefenderB": "Stefano",
+      "StrikerB": "Carmelo",
+      "ResultA": 4,
+      "ResultB": 10
+    },
+    {
+      "DefenderA": "Patrick",
+      "StrikerA": "Dario",
+      "DefenderB": "Mirko",
+      "StrikerB": "Vittorio",
+      "ResultA": 7,
+      "ResultB": 10
+    },
+    {
+      "DefenderA": "Stefano",
+      "StrikerA": "Dario",
+      "DefenderB": "Patrick",
+      "StrikerB": "Peppe",
+      "ResultA": 10,
+      "ResultB": 4
+    },
+    {
+      "DefenderA": "Domenico",
+      "StrikerA": "Vittorio",
+      "DefenderB": "Mirko",
+      "StrikerB": "Carmelo",
+      "ResultA": 7,
+      "ResultB": 10
+    },
+    {
+      "DefenderA": "Mirko",
+      "StrikerA": "Dario",
+      "DefenderB": "Stefano",
+      "StrikerB": "Peppe",
+      "ResultA": 11,
+      "ResultB": 13
+    },
+    {
+      "DefenderA": "Domenico",
+      "StrikerA": "Vittorio",
+      "DefenderB": "Stefano",
+      "StrikerB": "Carmelo",
+      "ResultA": 12,
+      "ResultB": 10
+    },
+    {
+      "DefenderA": "Peppe",
+      "StrikerA": "Carmelo",
+      "DefenderB": "Mirko",
+      "StrikerB": "Dario",
+      "ResultA": 10,
+      "ResultB": 8
+    },
+    {
+      "DefenderA": "Peppe",
+      "StrikerA": "Stefano",
+      "DefenderB": "Dario",
+      "StrikerB": "Vittorio",
+      "ResultA": 12,
+      "ResultB": 14
+    },
+    {
+      "DefenderA": "Domenico",
+      "StrikerA": "Carmelo",
+      "DefenderB": "Vittorio",
+      "StrikerB": "Dario",
+      "ResultA": 10,
+      "ResultB": 4
+    }
+  ]
+}
