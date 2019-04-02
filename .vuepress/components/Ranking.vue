@@ -9,8 +9,6 @@
 </template>
 
 <script>
-  import SampleData from '../public/api/ranking.json';
-
   export default {
     name: 'Ranking',
     data() {
@@ -19,13 +17,11 @@
       };
     },
     mounted() {
-      this.ranking = SampleData.ranking;
-
-      /*
-      this.$http.get(this.$withBase('/api/ranking.json')).then((response) => {
+      this.$http.get(
+        'https://raw.githubusercontent.com/paneedesign/table-soccer/tree/client/sample-api/ranking.json'
+      ).then((response) => {
         this.ranking = response.data.ranking;
       });
-      */
     },
   };
 </script>

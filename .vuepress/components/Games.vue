@@ -9,8 +9,6 @@
 </template>
 
 <script>
-  import SampleData from '../public/api/games.json';
-
   export default {
     name: 'Games',
     data() {
@@ -19,13 +17,11 @@
       };
     },
     mounted() {
-      this.games = SampleData.games;
-
-      /*
-      this.$http.get(this.$withBase('/api/games.json')).then((response) => {
+      this.$http.get(
+        'https://raw.githubusercontent.com/paneedesign/table-soccer/tree/client/sample-api/games.json'
+      ).then((response) => {
         this.games = response.data.games;
       });
-      */
     },
   };
 </script>

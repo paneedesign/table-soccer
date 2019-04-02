@@ -1,4 +1,4 @@
 ---
-title: Table Soccer
+title: Ranking
 component: Ranking
 ---

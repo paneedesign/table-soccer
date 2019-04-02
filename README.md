@@ -1,6 +1,6 @@
 ---
 title: Table Soccer
-component: Games
+component: Home
 ---
 
 ## Install dependencies

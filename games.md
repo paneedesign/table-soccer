@@ -1,0 +1,4 @@
+---
+title: Games
+component: Games
+---

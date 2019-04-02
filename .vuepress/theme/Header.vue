@@ -6,7 +6,7 @@
 
         <b-collapse is-nav id="nav_collapse">
             <b-navbar-nav>
-                <b-nav-item to="/">Games</b-nav-item>
+                <b-nav-item :to="$withBase('games.html')">Games</b-nav-item>
                 <b-nav-item :to="$withBase('ranking.html')">Ranking</b-nav-item>
             </b-navbar-nav>
         </b-collapse>
