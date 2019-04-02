@@ -18,7 +18,7 @@
     },
     mounted() {
       this.$http.get(
-        'https://raw.githubusercontent.com/paneedesign/table-soccer/client/sample-api/ranking.json'
+        'https://table-soccer-catania.herokuapp.com?ranking'
       ).then((response) => {
         this.ranking = response.data.ranking;
       });
