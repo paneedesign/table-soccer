@@ -18,7 +18,7 @@
     },
     mounted() {
       this.$http.get(
-        'https://raw.githubusercontent.com/paneedesign/table-soccer/tree/client/sample-api/games.json'
+        'https://raw.githubusercontent.com/paneedesign/table-soccer/client/sample-api/games.json'
       ).then((response) => {
         this.games = response.data.games;
       });

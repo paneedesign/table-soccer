@@ -18,7 +18,7 @@
     },
     mounted() {
       this.$http.get(
-        'https://raw.githubusercontent.com/paneedesign/table-soccer/tree/client/sample-api/ranking.json'
+        'https://raw.githubusercontent.com/paneedesign/table-soccer/client/sample-api/ranking.json'
       ).then((response) => {
         this.ranking = response.data.ranking;
       });
