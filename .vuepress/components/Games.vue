@@ -1,10 +1,10 @@
 <template>
     <div>
-        <b-row class="mb-3">
-            <b-col xs="12" lg="6">
+        <b-row>
+            <b-col xs="12" lg="6" class="mb-3">
                 <b-button v-b-modal.add-new>Add new game</b-button>
             </b-col>
-            <b-col xs="12" lg="6">
+            <b-col xs="12" lg="6" class="mb-3">
                 <b-alert :show="alertDismissCountDown"
                          dismissible
                          variant="success"
@@ -25,35 +25,33 @@
         </b-row>
 
         <b-modal id="add-new" title="Add new game" @ok="handleOk">
-            <div>
-                <h3>Red Team</h3>
-                <label for="red-team-defender">Defender</label>
-                <b-form-select id="red-team-defender" v-model="newGame.redTeam.defender" :options="players" class="mb-3">
-                    <option :value="null">Select a defender</option>
-                </b-form-select>
+            <h3>Red Team</h3>
+            <label for="red-team-defender">Defender</label>
+            <b-form-select id="red-team-defender" v-model="newGame.redTeam.defender" :options="players" class="mb-3">
+                <option :value="null">Select a defender</option>
+            </b-form-select>
 
-                <label for="red-team-striker">Striker</label>
-                <b-form-select id="red-team-striker" v-model="newGame.redTeam.striker" :options="players" class="mb-3">
-                    <option :value="null">Select a striker</option>
-                </b-form-select>
+            <label for="red-team-striker">Striker</label>
+            <b-form-select id="red-team-striker" v-model="newGame.redTeam.striker" :options="players" class="mb-3">
+                <option :value="null">Select a striker</option>
+            </b-form-select>
 
-                <label for="red-team-score">Score</label>
-                <b-form-input id="red-team-score" v-model="newGame.redTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
+            <label for="red-team-score">Score</label>
+            <b-form-input id="red-team-score" v-model="newGame.redTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
 
-                <h3>Blue Team</h3>
-                <label for="red-team-defender">Defender</label>
-                <b-form-select id="blue-team-defender" v-model="newGame.blueTeam.defender" :options="players" class="mb-3">
-                    <option :value="null">Select a defender</option>
-                </b-form-select>
+            <h3>Blue Team</h3>
+            <label for="red-team-defender">Defender</label>
+            <b-form-select id="blue-team-defender" v-model="newGame.blueTeam.defender" :options="players" class="mb-3">
+                <option :value="null">Select a defender</option>
+            </b-form-select>
 
-                <label for="red-team-striker">Striker</label>
-                <b-form-select id="blue-team-striker" v-model="newGame.blueTeam.striker" :options="players" class="mb-3">
-                    <option :value="null">Select a striker</option>
-                </b-form-select>
+            <label for="red-team-striker">Striker</label>
+            <b-form-select id="blue-team-striker" v-model="newGame.blueTeam.striker" :options="players" class="mb-3">
+                <option :value="null">Select a striker</option>
+            </b-form-select>
 
-                <label for="blue-team-score">Score</label>
-                <b-form-input id="blue-team-score" v-model="newGame.blueTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
-            </div>
+            <label for="blue-team-score">Score</label>
+            <b-form-input id="blue-team-score" v-model="newGame.blueTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
         </b-modal>
     </div>
 </template>
@@ -141,6 +139,8 @@
             score: parseInt(this.newGame.blueTeam.score, 10),
           },
           timestamp: new Date(),
+          // Hardcoded site location
+          site: 'Catania',
         };
 
         firestore
