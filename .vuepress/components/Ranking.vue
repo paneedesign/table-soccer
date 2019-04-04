@@ -2,7 +2,7 @@
     <div>
         <b-row>
             <b-col lg="10" offset-lg="1">
-                <b-table striped hover :items="ranking"></b-table>
+                <b-table responsive striped hover :items="ranking"></b-table>
             </b-col>
         </b-row>
     </div>
@@ -18,7 +18,7 @@
     },
     mounted() {
       this.$http.get(
-        'https://table-soccer-catania.herokuapp.com?ranking'
+        'https://table-soccer-catania.herokuapp.com'
       ).then((response) => {
         this.ranking = response.data.ranking;
       });

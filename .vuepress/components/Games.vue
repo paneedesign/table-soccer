@@ -1,63 +1,65 @@
 <template>
     <div>
-        <b-row>
-            <b-col xs="12" lg="6" class="mb-3">
-                <b-button v-b-modal.add-new>Add new game</b-button>
-            </b-col>
-            <b-col xs="12" lg="6" class="mb-3">
-                <b-alert :show="alertDismissCountDown"
-                         dismissible
-                         variant="success"
-                         @dismissed="alertDismissCountDown = 0"
-                         @dismiss-count-down="countDownChanged">
-                    Game added successfully
-                </b-alert>
-            </b-col>
-        </b-row>
+        <ClientOnly>
+            <b-row>
+                <b-col xs="12" lg="6" class="mb-3">
+                    <b-button v-b-modal.add-new>Add new game</b-button>
+                </b-col>
+                <b-col xs="12" lg="6" class="mb-3">
+                    <b-alert :show="alertDismissCountDown"
+                             dismissible
+                             variant="success"
+                             @dismissed="alertDismissCountDown = 0"
+                             @dismiss-count-down="countDownChanged">
+                        Game added successfully
+                    </b-alert>
+                </b-col>
+            </b-row>
 
-        <b-row>
-            <b-col lg="12">
-                <b-table v-if="games.length" responsive striped hover :items="games"></b-table>
-                <h4 v-else class="text-center">
-                    <b-spinner></b-spinner>
-                </h4>
-            </b-col>
-        </b-row>
+            <b-row>
+                <b-col lg="12">
+                    <b-table v-if="games.length" responsive striped hover :items="games"></b-table>
+                    <h4 v-else class="text-center">
+                        <b-spinner></b-spinner>
+                    </h4>
+                </b-col>
+            </b-row>
 
-        <b-modal id="add-new" title="Add new game" @ok="handleOk">
-            <h3>Red Team</h3>
-            <label for="red-team-defender">Defender</label>
-            <b-form-select id="red-team-defender" v-model="newGame.redTeam.defender" :options="players" class="mb-3">
-                <option :value="null">Select a defender</option>
-            </b-form-select>
+            <b-modal id="add-new" title="Add new game" @ok="handleOk">
+                <h3>Red Team</h3>
+                <label for="red-team-defender">Defender</label>
+                <b-form-select id="red-team-defender" v-model="newGame.redTeam.defender" :options="players" class="mb-3">
+                    <option :value="null">Select a defender</option>
+                </b-form-select>
 
-            <label for="red-team-striker">Striker</label>
-            <b-form-select id="red-team-striker" v-model="newGame.redTeam.striker" :options="players" class="mb-3">
-                <option :value="null">Select a striker</option>
-            </b-form-select>
+                <label for="red-team-striker">Striker</label>
+                <b-form-select id="red-team-striker" v-model="newGame.redTeam.striker" :options="players" class="mb-3">
+                    <option :value="null">Select a striker</option>
+                </b-form-select>
 
-            <label for="red-team-score">Score</label>
-            <b-form-input id="red-team-score" v-model="newGame.redTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
+                <label for="red-team-score">Score</label>
+                <b-form-input id="red-team-score" v-model="newGame.redTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
 
-            <h3>Blue Team</h3>
-            <label for="red-team-defender">Defender</label>
-            <b-form-select id="blue-team-defender" v-model="newGame.blueTeam.defender" :options="players" class="mb-3">
-                <option :value="null">Select a defender</option>
-            </b-form-select>
+                <h3>Blue Team</h3>
+                <label for="red-team-defender">Defender</label>
+                <b-form-select id="blue-team-defender" v-model="newGame.blueTeam.defender" :options="players" class="mb-3">
+                    <option :value="null">Select a defender</option>
+                </b-form-select>
 
-            <label for="red-team-striker">Striker</label>
-            <b-form-select id="blue-team-striker" v-model="newGame.blueTeam.striker" :options="players" class="mb-3">
-                <option :value="null">Select a striker</option>
-            </b-form-select>
+                <label for="red-team-striker">Striker</label>
+                <b-form-select id="blue-team-striker" v-model="newGame.blueTeam.striker" :options="players" class="mb-3">
+                    <option :value="null">Select a striker</option>
+                </b-form-select>
 
-            <label for="blue-team-score">Score</label>
-            <b-form-input id="blue-team-score" v-model="newGame.blueTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
-        </b-modal>
+                <label for="blue-team-score">Score</label>
+                <b-form-input id="blue-team-score" v-model="newGame.blueTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
+            </b-modal>
+        </ClientOnly>
     </div>
 </template>
 
 <script>
-  import { firestore } from '../services/firebase';
+  import asyncGetFirebase from '../services/firebase';
 
   const gameModel = () => {
     return {
@@ -94,11 +96,14 @@
       }
     },
     async mounted() {
-      await firestore.collection('players').get().then((querySnapshot) => {
+      const { firestore } = await asyncGetFirebase();
+      this.firestore = firestore;
+
+      await this.firestore.collection('players').get().then((querySnapshot) => {
         querySnapshot.forEach(doc => this.playersRef.push(doc));
       });
 
-      firestore
+      this.firestore
         .collection('games')
         .orderBy('timestamp', 'desc')
         .onSnapshot((querySnapshot) => {
@@ -129,13 +134,13 @@
         // TODO: Add VeeValidate
         const data = {
           redTeam: {
-            defender: firestore.doc(`players/${this.newGame.redTeam.defender}`),
-            striker: firestore.doc(`players/${this.newGame.redTeam.striker}`),
+            defender: this.firestore.doc(`players/${this.newGame.redTeam.defender}`),
+            striker: this.firestore.doc(`players/${this.newGame.redTeam.striker}`),
             score: parseInt(this.newGame.redTeam.score, 10),
           },
           blueTeam: {
-            defender: firestore.doc(`players/${this.newGame.blueTeam.defender}`),
-            striker: firestore.doc(`players/${this.newGame.blueTeam.striker}`),
+            defender: this.firestore.doc(`players/${this.newGame.blueTeam.defender}`),
+            striker: this.firestore.doc(`players/${this.newGame.blueTeam.striker}`),
             score: parseInt(this.newGame.blueTeam.score, 10),
           },
           timestamp: new Date(),
@@ -143,7 +148,7 @@
           site: 'Catania',
         };
 
-        firestore
+        this.firestore
           .collection('games')
           .add(data)
           .then((docRef) => {

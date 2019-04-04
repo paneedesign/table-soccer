@@ -10,9 +10,6 @@
     "build": "vuepress build",
     "deploy": "vuepress build && sh scripts/deploy.sh"
   },
-  "resolutions": {
-    "webpack-dev-middleware": "3.6.0"
-  },
   "author": "",
   "license": "MIT",
   "devDependencies": {

@@ -1,20 +1,26 @@
-import firebase from 'firebase';
-import 'firebase/firestore';
+const asyncGetFirebase = async () => {
+  const firebase = await import('firebase/app');
+  await import('firebase/firestore');
 
-const config = {
+  const config = {
     apiKey: 'AIzaSyDakdubwr2GBDVIx2XdTMZCNGoEFxNc3PM',
     projectId: 'ped-table-soccer',
-    // authDomain: '<PROJECT_ID>.firebaseapp.com',
-    // databaseURL: 'https://<DATABASE_NAME>.firebaseio.com',
-    // storageBucket: '<BUCKET>.appspot.com',
-    // messagingSenderId: '<SENDER_ID>',
-}
+  };
 
-const firebaseApp = firebase.initializeApp(config);
-const firestore = firebaseApp.firestore();
+  let firebaseApp = null;
 
-export {
-  firebaseApp,
-  firestore,
+  if (!firebase.apps.length) {
+    firebaseApp = firebase.initializeApp(config);
+  } else {
+    firebaseApp = firebase.app();
+  }
+
+  const firestore = firebaseApp.firestore();
+
+  return {
+    firebaseApp,
+    firestore,
+  };
 };
 
+export default asyncGetFirebase;
