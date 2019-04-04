@@ -7,6 +7,7 @@
             </transition>
             <site-footer/>
         </b-container>
+        <toast-container></toast-container>
     </div>
 </template>
 
@@ -26,4 +27,5 @@
     },
   };
 </script>
+
 <style src="../scss/main.scss" lang="scss"></style>

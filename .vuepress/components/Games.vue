@@ -2,57 +2,64 @@
     <div>
         <ClientOnly>
             <b-row>
-                <b-col xs="12" lg="6" class="mb-3">
-                    <b-button v-b-modal.add-new>Add new game</b-button>
-                </b-col>
-                <b-col xs="12" lg="6" class="mb-3">
-                    <b-alert :show="alertDismissCountDown"
-                             dismissible
-                             variant="success"
-                             @dismissed="alertDismissCountDown = 0"
-                             @dismiss-count-down="countDownChanged">
-                        Game added successfully
-                    </b-alert>
+                <b-col xs="12" class="mb-3">
+                    <b-button v-b-modal.add-game>Add new game</b-button>
                 </b-col>
             </b-row>
 
             <b-row>
                 <b-col lg="12">
-                    <b-table v-if="games.length" responsive striped hover :items="games"></b-table>
+                    <b-table v-if="games.length" responsive striped hover :items="games" :fields="tableFields">
+                        <template slot="actions" slot-scope="data">
+                            <div class="text-center cursor-pointer">
+                                <span @click="handleRemoveGame(data.item)">🙅🏿‍♂️</span>
+                            </div>
+                        </template>
+                    </b-table>
                     <h4 v-else class="text-center">
                         <b-spinner></b-spinner>
                     </h4>
                 </b-col>
             </b-row>
 
-            <b-modal id="add-new" title="Add new game" @ok="handleOk">
-                <h3>Red Team</h3>
-                <label for="red-team-defender">Defender</label>
-                <b-form-select id="red-team-defender" v-model="newGame.redTeam.defender" :options="players" class="mb-3">
-                    <option :value="null">Select a defender</option>
-                </b-form-select>
+            <!-- Modals -->
+            <b-modal id="add-game" title="Add new game" @ok="handleAddOk" size="lg">
+                <b-row>
+                    <b-col lg="6" xs="12">
+                        <h3>Red Team</h3>
+                        <label for="red-team-defender">Defender</label>
+                        <b-form-select id="red-team-defender" v-validate="'required'" name="red-team-defender" v-model="newGame.redTeam.defender" :options="players" class="mb-3">
+                            <option :value="null">Select a defender</option>
+                        </b-form-select>
 
-                <label for="red-team-striker">Striker</label>
-                <b-form-select id="red-team-striker" v-model="newGame.redTeam.striker" :options="players" class="mb-3">
-                    <option :value="null">Select a striker</option>
-                </b-form-select>
+                        <label for="red-team-striker">Striker</label>
+                        <b-form-select id="red-team-striker" v-validate="'required'" name="red-team-striker" v-model="newGame.redTeam.striker" :options="players" class="mb-3">
+                            <option :value="null">Select a striker</option>
+                        </b-form-select>
 
-                <label for="red-team-score">Score</label>
-                <b-form-input id="red-team-score" v-model="newGame.redTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
+                        <label for="red-team-score">Score</label>
+                        <b-form-input id="red-team-score" v-validate="'required'" name="red-team-score" v-model="newGame.redTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
+                    </b-col>
+                    <b-col lg="6" xs="12">
+                        <h3>Blue Team</h3>
+                        <label for="red-team-defender">Defender</label>
+                        <b-form-select id="blue-team-defender" v-validate="'required'" name="blue-team-defender" v-model="newGame.blueTeam.defender" :options="players" class="mb-3">
+                            <option :value="null">Select a defender</option>
+                        </b-form-select>
 
-                <h3>Blue Team</h3>
-                <label for="red-team-defender">Defender</label>
-                <b-form-select id="blue-team-defender" v-model="newGame.blueTeam.defender" :options="players" class="mb-3">
-                    <option :value="null">Select a defender</option>
-                </b-form-select>
+                        <label for="red-team-striker">Striker</label>
+                        <b-form-select id="blue-team-striker" v-validate="'required'" name="blue-team-striker" v-model="newGame.blueTeam.striker" :options="players" class="mb-3">
+                            <option :value="null">Select a striker</option>
+                        </b-form-select>
 
-                <label for="red-team-striker">Striker</label>
-                <b-form-select id="blue-team-striker" v-model="newGame.blueTeam.striker" :options="players" class="mb-3">
-                    <option :value="null">Select a striker</option>
-                </b-form-select>
+                        <label for="blue-team-score">Score</label>
+                        <b-form-input id="blue-team-score" v-validate="'required'" name="blue-team-score" v-model="newGame.blueTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
+                    </b-col>
+                </b-row>
+            </b-modal>
 
-                <label for="blue-team-score">Score</label>
-                <b-form-input id="blue-team-score" v-model="newGame.blueTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
+            <b-modal id="remove-game" title="Are you sure to remove this game?" @ok="handleRemoveOk" ref="remove-game-modal">
+                😱 This action is irreversible. Watch out! 😱
             </b-modal>
         </ClientOnly>
     </div>
@@ -82,8 +89,19 @@
       return {
         playersRef: [],
         games: [],
+        gameIdToRemove: null,
+        tableFields: [
+          'redDefender',
+          'redStriker',
+          'blueDefender',
+          'blueStriker',
+          'redScore',
+          'blueScore',
+          'location',
+          'date',
+          'actions'
+        ],
         newGame: { ...gameModel() },
-        alertDismissCountDown: 0,
       };
     },
     computed: {
@@ -99,8 +117,12 @@
       const { firestore } = await asyncGetFirebase();
       this.firestore = firestore;
 
-      await this.firestore.collection('players').get().then((querySnapshot) => {
-        querySnapshot.forEach(doc => this.playersRef.push(doc));
+      await this.firestore
+        .collection('players')
+        .orderBy('name', 'asc')
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach(doc => this.playersRef.push(doc));
       });
 
       this.firestore
@@ -110,28 +132,57 @@
           this.games = [];
 
           querySnapshot.forEach((doc) => {
-            this.games.push(this.parseGame(doc.data()))
+            this.games.push(this.parseGame(doc))
           });
         });
     },
     methods: {
-      parseGame(game) {
+      parseGame(gameRef) {
+        const game = gameRef.data();
         const redDefender = this.playersRef.find((player) => player.id === game.redTeam.defender.id).data();
         const redStriker = this.playersRef.find((player) => player.id === game.redTeam.striker.id).data();
         const blueDefender = this.playersRef.find((player) => player.id === game.blueTeam.defender.id).data();
         const blueStriker = this.playersRef.find((player) => player.id === game.blueTeam.striker.id).data();
+        const date = `${game.timestamp.toDate().getDate()}\\${game.timestamp.toDate().getMonth()}\\${game.timestamp.toDate().getFullYear()}`;
 
         return {
+          id: gameRef.id,
           redDefender: redDefender.name,
           redStriker: redStriker.name,
           blueDefender: blueDefender.name,
           blueStriker: blueStriker.name,
-          redScore: game.redTeam.score,
-          blueScore: game.blueTeam.score,
+          redScore: `${game.redTeam.score} ${game.blueTeam.score > game.redTeam.score ? '' : '🎉'}`,
+          blueScore: `${game.blueTeam.score} ${game.blueTeam.score > game.redTeam.score ? '🎉' : ''}`,
+          location: `🌇 ${game.site}`,
+          date,
         };
       },
-      handleOk() {
-        // TODO: Add VeeValidate
+      handleRemoveGame(game) {
+        const { id } = game;
+        this.gameIdToRemove = id;
+        this.$refs['remove-game-modal'].show();
+      },
+      handleRemoveOk() {
+        this.$vueOnToast.pop('error', 'Disabled', 'Can\'t remove the game NOW');
+        return 0; // TODO: Remove this after doing auth
+        this.firestore.collection('games').doc(this.gameIdToRemove).delete().then(() => {
+          console.log('Document successfully deleted!');
+          this.$vueOnToast.pop('success', 'Success', 'Game Removed');
+          this.gameIdToRemove = null;
+        }).catch((error) => {
+          console.error('Error removing document: ', error);
+          this.$vueOnToast.pop('error', 'Error', 'Can\'t remove the game');
+          this.gameIdToRemove = null;
+        });
+      },
+      async handleAddOk() {
+        const valid = await this.$validator.validateAll();
+
+        if (!valid) {
+          this.$vueOnToast.pop('error', 'Error', 'Check your data and retry');
+          return;
+        }
+
         const data = {
           redTeam: {
             defender: this.firestore.doc(`players/${this.newGame.redTeam.defender}`),
@@ -153,20 +204,21 @@
           .add(data)
           .then((docRef) => {
             console.debug('Document written with ID: ', docRef.id);
-
-            // Show an alert
-            this.alertDismissCountDown = 3;
-
+            this.$vueOnToast.pop('success', 'Success', 'Game inserted');
             // Reset game model
             this.newGame = { ...gameModel() };
           })
           .catch((error) => {
             console.error('Error adding document: ', error);
+            this.$vueOnToast.pop('error', 'Error', 'Can\'t add the game');
           });
-      },
-      countDownChanged(dismissCountDown) {
-        this.alertDismissCountDown = dismissCountDown;
       },
     }
   };
 </script>
+
+<style scoped>
+    .cursor-pointer {
+        cursor: pointer;
+    }
+</style>
