@@ -55,6 +55,10 @@
                         <label for="blue-team-score">Score</label>
                         <b-form-input id="blue-team-score" v-validate="'required'" name="blue-team-score" v-model="newGame.blueTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
                     </b-col>
+                    <b-col lg="12">
+                        <label for="site">Site</label>
+                        <b-form-input id="site"  name="site" v-model="newGame.site" type="text" class="mb-3" readonly></b-form-input>
+                    </b-col>
                 </b-row>
             </b-modal>
 
@@ -80,6 +84,7 @@
         striker: null,
         score: 0,
       },
+      site: 'Catania',
     };
   };
 
@@ -151,8 +156,8 @@
           redStriker: redStriker.name,
           blueDefender: blueDefender.name,
           blueStriker: blueStriker.name,
-          redScore: `${game.redTeam.score} ${game.blueTeam.score > game.redTeam.score ? '' : '🎉'}`,
-          blueScore: `${game.blueTeam.score} ${game.blueTeam.score > game.redTeam.score ? '🎉' : ''}`,
+          redScore: game.redTeam.score,
+          blueScore: game.blueTeam.score,
           location: `🌇 ${game.site}`,
           date,
         };
@@ -163,15 +168,13 @@
         this.$refs['remove-game-modal'].show();
       },
       handleRemoveOk() {
-        this.$vueOnToast.pop('error', 'Disabled', 'Can\'t remove the game NOW');
-        return 0; // TODO: Remove this after doing auth
         this.firestore.collection('games').doc(this.gameIdToRemove).delete().then(() => {
           console.log('Document successfully deleted!');
           this.$vueOnToast.pop('success', 'Success', 'Game Removed');
           this.gameIdToRemove = null;
         }).catch((error) => {
           console.error('Error removing document: ', error);
-          this.$vueOnToast.pop('error', 'Error', 'Can\'t remove the game');
+          this.$vueOnToast.pop('error', 'Error', error.message);
           this.gameIdToRemove = null;
         });
       },
@@ -204,13 +207,13 @@
           .add(data)
           .then((docRef) => {
             console.debug('Document written with ID: ', docRef.id);
+
             this.$vueOnToast.pop('success', 'Success', 'Game inserted');
-            // Reset game model
             this.newGame = { ...gameModel() };
           })
           .catch((error) => {
             console.error('Error adding document: ', error);
-            this.$vueOnToast.pop('error', 'Error', 'Can\'t add the game');
+            this.$vueOnToast.pop('error', 'Error', error.message);
           });
       },
     }
