@@ -70,7 +70,6 @@
 </template>
 
 <script>
-  import asyncGetFirebase from '../services/firebase';
 
   const gameModel = () => {
     return {
@@ -118,19 +117,16 @@
           }));
       }
     },
-    async mounted() {
-      const { firestore } = await asyncGetFirebase();
-      this.firestore = firestore;
-
-      await this.firestore
+    firebaseReady() {
+      this.$firestore
         .collection('players')
         .orderBy('name', 'asc')
         .get()
         .then((querySnapshot) => {
           querySnapshot.forEach(doc => this.playersRef.push(doc));
-      });
+        });
 
-      this.firestore
+      this.$firestore
         .collection('games')
         .orderBy('timestamp', 'desc')
         .onSnapshot((querySnapshot) => {
@@ -175,7 +171,7 @@
         this.$refs['remove-game-modal'].show();
       },
       handleRemoveOk() {
-        this.firestore.collection('games').doc(this.gameIdToRemove).delete().then(() => {
+        this.$firestore.collection('games').doc(this.gameIdToRemove).delete().then(() => {
           console.log('Document successfully deleted!');
           this.$vueOnToast.pop('success', 'Success', 'Game Removed');
           this.gameIdToRemove = null;
@@ -195,13 +191,13 @@
 
         const data = {
           redTeam: {
-            defender: this.firestore.doc(`players/${this.newGame.redTeam.defender}`),
-            striker: this.firestore.doc(`players/${this.newGame.redTeam.striker}`),
+            defender: this.$firestore.doc(`players/${this.newGame.redTeam.defender}`),
+            striker: this.$firestore.doc(`players/${this.newGame.redTeam.striker}`),
             score: parseInt(this.newGame.redTeam.score, 10),
           },
           blueTeam: {
-            defender: this.firestore.doc(`players/${this.newGame.blueTeam.defender}`),
-            striker: this.firestore.doc(`players/${this.newGame.blueTeam.striker}`),
+            defender: this.$firestore.doc(`players/${this.newGame.blueTeam.defender}`),
+            striker: this.$firestore.doc(`players/${this.newGame.blueTeam.striker}`),
             score: parseInt(this.newGame.blueTeam.score, 10),
           },
           timestamp: new Date(),
@@ -209,7 +205,7 @@
           site: 'Catania',
         };
 
-        this.firestore
+        this.$firestore
           .collection('games')
           .add(data)
           .then((docRef) => {

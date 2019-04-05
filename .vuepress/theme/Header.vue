@@ -19,8 +19,6 @@
 </template>
 
 <script>
-  import asyncGetFirebase from '../services/firebase';
-
   export default {
     name: 'Header',
     data() {
@@ -28,17 +26,15 @@
         user: null,
       }
     },
-    async mounted() {
-      const { firebase } = await asyncGetFirebase();
-      this.firebase = firebase;
-      this.firebase.auth().onAuthStateChanged((user) => {
+    firebaseReady() {
+      this.$firebase.auth().onAuthStateChanged((user) => {
         this.user = user;
       });
     },
     methods: {
       signInWithGoogle() {
-        const provider = new this.firebase.auth.GoogleAuthProvider();
-        this.firebase.auth().signInWithPopup(provider).then((result) => {
+        const provider = new this.$firebase.auth.GoogleAuthProvider();
+        this.$firebase.auth().signInWithPopup(provider).then((result) => {
           this.user = result;
           this.$vueOnToast.pop('success', 'Success', 'Signed in successfully');
         }).catch((error) => {
@@ -47,7 +43,7 @@
         });
       },
       signOut() {
-        this.firebase.auth().signOut().then(() => {
+        this.$firebase.auth().signOut().then(() => {
           this.user = null;
           this.$vueOnToast.pop('success', 'Success', 'Signed out successfully');
           console.log('Sign out successfully');
