@@ -12,7 +12,7 @@
                     <b-table v-if="games.length" responsive striped hover :items="games" :fields="tableFields">
                         <template slot="actions" slot-scope="data">
                             <div class="text-center cursor-pointer">
-                                <span @click="handleRemoveGame(data.item)">🙅🏿‍♂️</span>
+                                <span @click="handleRemoveGame(data.item)" v-if="canRemoveGame(data.item)">🙅🏿‍♂️</span>
                             </div>
                         </template>
                     </b-table>
@@ -148,7 +148,7 @@
         const redStriker = this.playersRef.find((player) => player.id === game.redTeam.striker.id).data();
         const blueDefender = this.playersRef.find((player) => player.id === game.blueTeam.defender.id).data();
         const blueStriker = this.playersRef.find((player) => player.id === game.blueTeam.striker.id).data();
-        const date = `${game.timestamp.toDate().getDate()}\\${game.timestamp.toDate().getMonth()}\\${game.timestamp.toDate().getFullYear()}`;
+        const date = this.formatDate(game.timestamp.toDate());
 
         return {
           id: gameRef.id,
@@ -161,6 +161,13 @@
           location: `🌇 ${game.site}`,
           date,
         };
+      },
+      formatDate(date) {
+        return `${date.getDate()}\\${date.getMonth()}\\${date.getFullYear()}`;
+      },
+      canRemoveGame(game) {
+        const { date } = game;
+        return date === this.formatDate(new Date());
       },
       handleRemoveGame(game) {
         const { id } = game;
