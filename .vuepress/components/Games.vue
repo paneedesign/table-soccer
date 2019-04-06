@@ -117,8 +117,8 @@
           }));
       }
     },
-    firebaseReady() {
-      this.$firestore
+    async firebaseReady() {
+      await this.$firestore
         .collection('players')
         .orderBy('name', 'asc')
         .get()
