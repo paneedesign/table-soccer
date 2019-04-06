@@ -1,72 +1,72 @@
 <template>
-    <div>
-        <ClientOnly>
-            <b-row>
-                <b-col xs="12" class="mb-3">
-                    <b-button v-b-modal.add-game>Add new game</b-button>
-                </b-col>
-            </b-row>
+  <div>
+    <ClientOnly>
+      <b-row>
+        <b-col xs="12" class="mb-3">
+          <b-button v-b-modal.add-game>Add new game</b-button>
+        </b-col>
+      </b-row>
 
-            <b-row>
-                <b-col lg="12">
-                    <b-table v-if="games.length" responsive striped hover :items="games" :fields="tableFields">
-                        <template slot="actions" slot-scope="data">
-                            <div class="text-center cursor-pointer">
-                                <span @click="handleRemoveGame(data.item)" v-if="canRemoveGame(data.item)">🙅🏿‍♂️</span>
-                            </div>
-                        </template>
-                    </b-table>
-                    <h4 v-else class="text-center">
-                        <b-spinner></b-spinner>
-                    </h4>
-                </b-col>
-            </b-row>
+      <b-row>
+        <b-col lg="12">
+          <b-table v-if="games.length" responsive striped hover :items="games" :fields="tableFields">
+            <template slot="actions" slot-scope="data">
+              <div class="text-center cursor-pointer">
+                <span @click="handleRemoveGame(data.item)" v-if="canRemoveGame(data.item)">🙅🏿‍♂️</span>
+              </div>
+            </template>
+          </b-table>
+          <h4 v-else class="text-center">
+            <b-spinner></b-spinner>
+          </h4>
+        </b-col>
+      </b-row>
 
-            <!-- Modals -->
-            <b-modal id="add-game" title="Add new game" @ok="handleAddOk" size="lg">
-                <b-row>
-                    <b-col lg="6" xs="12">
-                        <h3>Red Team</h3>
-                        <label for="red-team-defender">Defender</label>
-                        <b-form-select id="red-team-defender" v-validate="'required'" name="red-team-defender" v-model="newGame.redTeam.defender" :options="players" class="mb-3">
-                            <option :value="null">Select a defender</option>
-                        </b-form-select>
+      <!-- Modals -->
+      <b-modal id="add-game" title="Add new game" @ok="handleAddOk" size="lg">
+        <b-row>
+          <b-col lg="6" xs="12">
+            <h3>Red Team</h3>
+            <label for="red-team-defender">Defender</label>
+            <b-form-select id="red-team-defender" v-validate="'required'" name="red-team-defender" v-model="newGame.redTeam.defender" :options="players" class="mb-3">
+              <option :value="null">Select a defender</option>
+            </b-form-select>
 
-                        <label for="red-team-striker">Striker</label>
-                        <b-form-select id="red-team-striker" v-validate="'required'" name="red-team-striker" v-model="newGame.redTeam.striker" :options="players" class="mb-3">
-                            <option :value="null">Select a striker</option>
-                        </b-form-select>
+            <label for="red-team-striker">Striker</label>
+            <b-form-select id="red-team-striker" v-validate="'required'" name="red-team-striker" v-model="newGame.redTeam.striker" :options="players" class="mb-3">
+              <option :value="null">Select a striker</option>
+            </b-form-select>
 
-                        <label for="red-team-score">Score</label>
-                        <b-form-input id="red-team-score" v-validate="'required'" name="red-team-score" v-model="newGame.redTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
-                    </b-col>
-                    <b-col lg="6" xs="12">
-                        <h3>Blue Team</h3>
-                        <label for="red-team-defender">Defender</label>
-                        <b-form-select id="blue-team-defender" v-validate="'required'" name="blue-team-defender" v-model="newGame.blueTeam.defender" :options="players" class="mb-3">
-                            <option :value="null">Select a defender</option>
-                        </b-form-select>
+            <label for="red-team-score">Score</label>
+            <b-form-input id="red-team-score" v-validate="'required'" name="red-team-score" v-model="newGame.redTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
+          </b-col>
+          <b-col lg="6" xs="12">
+            <h3>Blue Team</h3>
+            <label for="red-team-defender">Defender</label>
+            <b-form-select id="blue-team-defender" v-validate="'required'" name="blue-team-defender" v-model="newGame.blueTeam.defender" :options="players" class="mb-3">
+              <option :value="null">Select a defender</option>
+            </b-form-select>
 
-                        <label for="red-team-striker">Striker</label>
-                        <b-form-select id="blue-team-striker" v-validate="'required'" name="blue-team-striker" v-model="newGame.blueTeam.striker" :options="players" class="mb-3">
-                            <option :value="null">Select a striker</option>
-                        </b-form-select>
+            <label for="red-team-striker">Striker</label>
+            <b-form-select id="blue-team-striker" v-validate="'required'" name="blue-team-striker" v-model="newGame.blueTeam.striker" :options="players" class="mb-3">
+              <option :value="null">Select a striker</option>
+            </b-form-select>
 
-                        <label for="blue-team-score">Score</label>
-                        <b-form-input id="blue-team-score" v-validate="'required'" name="blue-team-score" v-model="newGame.blueTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
-                    </b-col>
-                    <b-col lg="12">
-                        <label for="site">Site</label>
-                        <b-form-input id="site"  name="site" v-model="newGame.site" type="text" class="mb-3" readonly></b-form-input>
-                    </b-col>
-                </b-row>
-            </b-modal>
+            <label for="blue-team-score">Score</label>
+            <b-form-input id="blue-team-score" v-validate="'required'" name="blue-team-score" v-model="newGame.blueTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
+          </b-col>
+          <b-col lg="12">
+            <label for="site">Site</label>
+            <b-form-input id="site"  name="site" v-model="newGame.site" type="text" class="mb-3" readonly></b-form-input>
+          </b-col>
+        </b-row>
+      </b-modal>
 
-            <b-modal id="remove-game" title="Are you sure to remove this game?" @ok="handleRemoveOk" ref="remove-game-modal">
-                😱 This action is irreversible. Watch out! 😱
-            </b-modal>
-        </ClientOnly>
-    </div>
+      <b-modal id="remove-game" title="Are you sure to remove this game?" @ok="handleRemoveOk" ref="remove-game-modal">
+        😱 This action is irreversible. Watch out! 😱
+      </b-modal>
+    </ClientOnly>
+  </div>
 </template>
 
 <script>
@@ -129,11 +129,12 @@
       this.$firestore
         .collection('games')
         .orderBy('timestamp', 'desc')
+        .limit(25)
         .onSnapshot((querySnapshot) => {
           this.games = [];
 
           querySnapshot.forEach((doc) => {
-            this.games.push(this.parseGame(doc))
+            this.games.push(this.parseGame(doc));
           });
         });
     },
@@ -148,10 +149,10 @@
 
         return {
           id: gameRef.id,
-          redDefender: redDefender.name,
-          redStriker: redStriker.name,
-          blueDefender: blueDefender.name,
-          blueStriker: blueStriker.name,
+          redDefender: `${redDefender.name} ${redDefender.surname.charAt(0).toUpperCase()}.`,
+          redStriker: `${redStriker.name} ${redStriker.surname.charAt(0).toUpperCase()}.`,
+          blueDefender: `${blueDefender.name} ${blueDefender.surname.charAt(0).toUpperCase()}.`,
+          blueStriker: `${blueStriker.name} ${blueStriker.surname.charAt(0).toUpperCase()}.`,
           redScore: game.redTeam.score,
           blueScore: game.blueTeam.score,
           location: `🌇 ${game.site}`,
@@ -224,7 +225,7 @@
 </script>
 
 <style scoped>
-    .cursor-pointer {
-        cursor: pointer;
-    }
+  .cursor-pointer {
+    cursor: pointer;
+  }
 </style>
