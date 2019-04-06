@@ -1,9 +1,16 @@
 <template>
   <div class="ranking">
     <b-row>
-      <b-col lg="6">
+      <b-col lg="7">
         <h5 class="mb-3">Player Ranking</h5>
-        <b-table v-if="playerRanking.length" responsive striped hover :items="playerRanking" :fields="playerTableFields">
+        <b-table v-if="playerRanking.length"
+                 responsive
+                 striped
+                 hover
+                 :fields="playerTableFields"
+                 :items="playerRanking"
+                 :sort-by.sync="playerSortBy"
+                 :sort-desc.sync="playerSortDesc">
           <template slot="position" slot-scope="data">
             {{ data.index + 1 }}
           </template>
@@ -12,7 +19,7 @@
           <b-spinner></b-spinner>
         </h4>
       </b-col>
-      <b-col lg="6">
+      <b-col lg="5">
         <h5 class="mb-3">Team Ranking</h5>
         <b-table v-if="teamRanking.length" responsive striped hover :items="teamRanking" :fields="teamTableFields">
           <template slot="position" slot-scope="data">
@@ -35,12 +42,19 @@
     data() {
       return {
         playersRef: [],
+        playerSortBy: 'score',
+        playerSortDesc: false,
         playerRanking: [],
         teamRanking: [],
         playerTableFields: [
-          'position',
-          'player',
-          'score',
+          { key: 'position', sortable: false },
+          { key: 'player', sortable: false },
+          { key: 'score', sortable: true },
+          { key: 'played', sortable: true },
+          { key: 'won', sortable: true },
+          { key: 'lost', sortable: true },
+          { key: 'GF', sortable: true },
+          { key: 'GS', sortable: true },
         ],
         teamTableFields: [
           'position',
@@ -117,16 +131,16 @@
         const blueStriker = this.playersRef.find(player => player.id === game.blueTeam.striker.id);
 
         const baseRanking = {
-          [redDefender.id]: 1000,
-          [redStriker.id]: 1000,
-          [blueDefender.id]: 1000,
-          [blueStriker.id]: 1000,
+          [redDefender.id]: { won: 0, played: 0, golScored: 0, goalSuffered: 0, rating: 1000 },
+          [redStriker.id]: { won: 0, played: 0, golScored: 0, goalSuffered: 0, rating: 1000 },
+          [blueDefender.id]: { won: 0, played: 0, golScored: 0, goalSuffered: 0, rating: 1000 },
+          [blueStriker.id]: { won: 0, played: 0, golScored: 0, goalSuffered: 0, rating: 1000 },
         };
 
         ranking = { ...baseRanking, ...ranking };
 
-        const redTeamRating = ranking[redDefender.id] + ranking[redStriker.id];
-        const blueTeamRating = ranking[blueDefender.id] + ranking[blueStriker.id];
+        const redTeamRating = ranking[redDefender.id].rating + ranking[redStriker.id].rating;
+        const blueTeamRating = ranking[blueDefender.id].rating + ranking[blueStriker.id].rating;
 
         // Get team results
         const redTeamResult = game.redTeam.score > game.blueTeam.score ? 1 : 0;
@@ -139,10 +153,30 @@
         const redDelta = newRedRating - redTeamRating;
         const blueDelta = newBlueRating - blueTeamRating;
 
-        ranking[redDefender.id] += redDelta;
-        ranking[redStriker.id] += redDelta;
-        ranking[blueDefender.id] += blueDelta;
-        ranking[blueStriker.id] += blueDelta;
+        ranking[redDefender.id].rating += redDelta;
+        ranking[redStriker.id].rating += redDelta;
+        ranking[blueDefender.id].rating += blueDelta;
+        ranking[blueStriker.id].rating += blueDelta;
+
+        ranking[redDefender.id].played += 1;
+        ranking[redStriker.id].played += 1;
+        ranking[blueDefender.id].played += 1;
+        ranking[blueStriker.id].played += 1;
+
+        ranking[redDefender.id].won += redTeamResult;
+        ranking[redStriker.id].won += redTeamResult;
+        ranking[blueDefender.id].won += blueTeamResult;
+        ranking[blueStriker.id].won += blueTeamResult;
+
+        ranking[redDefender.id].golScored += game.redTeam.score;
+        ranking[redStriker.id].golScored += game.redTeam.score;
+        ranking[blueDefender.id].golScored += game.blueTeam.score;
+        ranking[blueStriker.id].golScored += game.blueTeam.score;
+
+        ranking[redDefender.id].goalSuffered += game.blueTeam.score;
+        ranking[redStriker.id].goalSuffered += game.blueTeam.score;
+        ranking[blueDefender.id].goalSuffered += game.redTeam.score;
+        ranking[blueStriker.id].goalSuffered += game.redTeam.score;
 
         return ranking;
       },
@@ -151,7 +185,12 @@
           const player = this.playersRef.find(player => player.id === key).data();
           return {
             player: `${player.name} ${player.surname.charAt(0).toUpperCase()}.`,
-            score: rankingObject[key],
+            played: rankingObject[key].played,
+            score: rankingObject[key].rating,
+            won: rankingObject[key].won,
+            lost: rankingObject[key].played - rankingObject[key].won,
+            GF: rankingObject[key].golScored,
+            GS: rankingObject[key].goalSuffered,
           }
         }).sort((rankA, rankB) => {
           if (rankA.score > rankB.score) return -1;
