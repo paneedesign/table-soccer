@@ -1,36 +1,51 @@
 <template>
   <div class="ranking">
-    <b-row>
-      <b-col lg="7">
-        <h5 class="mb-3">Player Ranking</h5>
-        <b-table v-if="playerRanking.length"
-                 responsive
-                 striped
-                 hover
-                 :fields="playerTableFields"
-                 :items="playerRanking"
-                 :sort-by.sync="playerSortBy"
-                 :sort-desc.sync="playerSortDesc">
-          <template slot="position" slot-scope="data">
-            {{ data.index + 1 }}
-          </template>
-        </b-table>
-        <h4 v-else class="text-center">
-          <b-spinner></b-spinner>
-        </h4>
-      </b-col>
-      <b-col lg="5">
-        <h5 class="mb-3">Team Ranking</h5>
-        <b-table v-if="teamRanking.length" responsive striped hover :items="teamRanking" :fields="teamTableFields">
-          <template slot="position" slot-scope="data">
-            {{ data.index + 1 }}
-          </template>
-        </b-table>
-        <h4 v-else class="text-center">
-          <b-spinner></b-spinner>
-        </h4>
-      </b-col>
-    </b-row>
+
+    <b-tabs content-class="mt-3">
+      <b-tab title="Player Ranking" active>
+        <b-row>
+          <b-col lg="12">
+            <b-table v-if="playerRanking.length"
+                     responsive
+                     striped
+                     hover
+                     :fields="playerTableFields"
+                     :items="playerRanking"
+                     :sort-by.sync="playerSortBy"
+                     :sort-desc.sync="playerSortDesc">
+              <template slot="position" slot-scope="data">
+                {{ data.index + 1 }}
+              </template>
+            </b-table>
+            <h4 v-else class="text-center">
+              <b-spinner></b-spinner>
+            </h4>
+          </b-col>
+        </b-row>
+      </b-tab>
+      <b-tab title="Team Ranking">
+        <b-row>
+          <b-col lg="12">
+            <b-table
+              v-if="teamRanking.length"
+              responsive
+              striped
+              hover
+              :fields="teamTableFields"
+              :items="teamRanking"
+              :sort-by.sync="teamSortBy"
+              :sort-desc.sync="teamSortDesc">
+              <template slot="position" slot-scope="data">
+                {{ data.index + 1 }}
+              </template>
+            </b-table>
+            <h4 v-else class="text-center">
+              <b-spinner></b-spinner>
+            </h4>
+          </b-col>
+        </b-row>
+      </b-tab>
+    </b-tabs>
   </div>
 </template>
 
@@ -43,7 +58,7 @@
       return {
         playersRef: [],
         playerSortBy: 'score',
-        playerSortDesc: false,
+        playerSortDesc: true,
         playerRanking: [],
         teamRanking: [],
         playerTableFields: [
@@ -56,11 +71,18 @@
           { key: 'GF', sortable: true },
           { key: 'GS', sortable: true },
         ],
+        teamSortBy: 'score',
+        teamSortDesc: true,
         teamTableFields: [
-          'position',
-          'defender',
-          'striker',
-          'score',
+          { key: 'position', sortable: false },
+          { key: 'defender', sortable: false },
+          { key: 'striker', sortable: false },
+          { key: 'score', sortable: true },
+          { key: 'played', sortable: true },
+          { key: 'won', sortable: true },
+          { key: 'lost', sortable: true },
+          { key: 'GF', sortable: true },
+          { key: 'GS', sortable: true },
         ],
       };
     },
@@ -96,16 +118,18 @@
         const redStriker = this.playersRef.find(player => player.id === game.redTeam.striker.id);
         const blueDefender = this.playersRef.find(player => player.id === game.blueTeam.defender.id);
         const blueStriker = this.playersRef.find(player => player.id === game.blueTeam.striker.id);
+        const redTeam = `${redDefender.id}-${redStriker.id}`;
+        const blueTeam = `${blueDefender.id}-${blueStriker.id}`;
 
         const baseRanking = {
-          [`${redDefender.id}-${redStriker.id}`]: 1000,
-          [`${blueDefender.id}-${blueStriker.id}`]: 1000,
+          [redTeam]: { won: 0, played: 0, golScored: 0, goalSuffered: 0, rating: 1000 },
+          [blueTeam]: { won: 0, played: 0, golScored: 0, goalSuffered: 0, rating: 1000 },
         };
 
         ranking = { ...baseRanking, ...ranking };
 
-        const redTeamRating = ranking[`${redDefender.id}-${redStriker.id}`];
-        const blueTeamRating = ranking[`${blueDefender.id}-${blueStriker.id}`];
+        const redTeamRating = ranking[redTeam].rating;
+        const blueTeamRating = ranking[blueTeam].rating;
 
         // Get team results
         const redTeamResult = game.redTeam.score > game.blueTeam.score ? 1 : 0;
@@ -118,8 +142,20 @@
         const redDelta = newRedRating - redTeamRating;
         const blueDelta = newBlueRating - blueTeamRating;
 
-        ranking[`${redDefender.id}-${redStriker.id}`] += redDelta;
-        ranking[`${blueDefender.id}-${blueStriker.id}`] += blueDelta;
+        ranking[redTeam].rating += redDelta;
+        ranking[blueTeam].rating += blueDelta;
+
+        ranking[redTeam].played += 1;
+        ranking[blueTeam].played += 1;
+
+        ranking[redTeam].won += redTeamResult;
+        ranking[blueTeam].won += blueTeamResult;
+
+        ranking[redTeam].golScored += game.redTeam.score;
+        ranking[blueTeam].golScored += game.blueTeam.score;
+
+        ranking[redTeam].goalSuffered += game.blueTeam.score;
+        ranking[blueTeam].goalSuffered += game.redTeam.score;
 
         return ranking;
       },
@@ -192,10 +228,6 @@
             GF: rankingObject[key].golScored,
             GS: rankingObject[key].goalSuffered,
           }
-        }).sort((rankA, rankB) => {
-          if (rankA.score > rankB.score) return -1;
-          if (rankA.score < rankB.score) return 1;
-          return 0;
         });
       },
       parseTeamRanking(rankingObject) {
@@ -208,12 +240,13 @@
           return {
             defender: `${defender.name} ${defender.surname.charAt(0).toUpperCase()}.`,
             striker: `${striker.name} ${striker.surname.charAt(0).toUpperCase()}.`,
-            score: rankingObject[key],
+            played: rankingObject[key].played,
+            won: rankingObject[key].won,
+            lost: rankingObject[key].played - rankingObject[key].won,
+            GF: rankingObject[key].golScored,
+            GS: rankingObject[key].goalSuffered,
+            score: rankingObject[key].rating,
           }
-        }).sort((rankA, rankB) => {
-          if (rankA.score > rankB.score) return -1;
-          if (rankA.score < rankB.score) return 1;
-          return 0;
         });
       },
     },
