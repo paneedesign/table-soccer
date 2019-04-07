@@ -243,7 +243,6 @@ export default {
       });
     },
     parseTeamRanking(rankingObject) {
-      console.log(rankingObject);
       return Object.keys(rankingObject).map((key) => {
         let [defender, striker] = key.split('-');
         defender = this.playersRef.find(player => player.id === defender).data();
