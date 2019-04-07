@@ -3,19 +3,28 @@
     <ClientOnly>
       <b-row>
         <b-col xs="12" class="mb-3">
-          <b-button v-b-modal.add-game>Add new game</b-button>
+          <b-button v-b-modal.modal-prevent.add-game>Add new game</b-button>
         </b-col>
       </b-row>
 
       <b-row>
         <b-col lg="12">
-          <b-table v-if="games.length" responsive striped hover :items="games" :fields="tableFields">
-            <template slot="actions" slot-scope="data">
-              <div class="text-center cursor-pointer">
-                <span @click="handleRemoveGame(data.item)" v-if="canRemoveGame(data.item)">🙅🏿‍♂️</span>
-              </div>
-            </template>
-          </b-table>
+          <div v-if="games.length">
+            <b-table id="games-table" responsive striped hover :items="games" :fields="tableFields" :per-page="perPage" :current-page="currentPage">
+              <template slot="actions" slot-scope="data">
+                <div class="text-center cursor-pointer">
+                  <span @click="handleRemoveGame(data.item)" v-if="canRemoveGame(data.item)">🙅🏿‍♂️</span>
+                </div>
+              </template>
+            </b-table>
+            <b-pagination
+              align="center"
+              v-model="currentPage"
+              :total-rows="games.length"
+              :per-page="perPage"
+              aria-controls="games-table"
+            ></b-pagination>
+          </div>
           <h4 v-else class="text-center">
             <b-spinner></b-spinner>
           </h4>
@@ -23,43 +32,73 @@
       </b-row>
 
       <!-- Modals -->
-      <b-modal id="add-game" title="Add new game" @ok="handleAddOk" size="lg">
-        <b-row>
-          <b-col lg="6" xs="12">
-            <h3>Red Team</h3>
-            <label for="red-team-defender">Defender</label>
-            <b-form-select id="red-team-defender" v-validate="'required'" name="red-team-defender" v-model="newGame.redTeam.defender" :options="players" class="mb-3">
-              <option :value="null">Select a defender</option>
-            </b-form-select>
-
-            <label for="red-team-striker">Striker</label>
-            <b-form-select id="red-team-striker" v-validate="'required'" name="red-team-striker" v-model="newGame.redTeam.striker" :options="players" class="mb-3">
-              <option :value="null">Select a striker</option>
-            </b-form-select>
-
-            <label for="red-team-score">Score</label>
-            <b-form-input id="red-team-score" v-validate="'required'" name="red-team-score" v-model="newGame.redTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
-          </b-col>
-          <b-col lg="6" xs="12">
-            <h3>Blue Team</h3>
-            <label for="red-team-defender">Defender</label>
-            <b-form-select id="blue-team-defender" v-validate="'required'" name="blue-team-defender" v-model="newGame.blueTeam.defender" :options="players" class="mb-3">
-              <option :value="null">Select a defender</option>
-            </b-form-select>
-
-            <label for="red-team-striker">Striker</label>
-            <b-form-select id="blue-team-striker" v-validate="'required'" name="blue-team-striker" v-model="newGame.blueTeam.striker" :options="players" class="mb-3">
-              <option :value="null">Select a striker</option>
-            </b-form-select>
-
-            <label for="blue-team-score">Score</label>
-            <b-form-input id="blue-team-score" v-validate="'required'" name="blue-team-score" v-model="newGame.blueTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
-          </b-col>
-          <b-col lg="12">
-            <label for="site">Site</label>
-            <b-form-input id="site"  name="site" v-model="newGame.site" type="text" class="mb-3" readonly></b-form-input>
-          </b-col>
-        </b-row>
+      <b-modal id="add-game" title="Add new game" @ok="handleAddOk" size="lg" ref="add-game-modal">
+        <form @submit.stop.prevent="handleSubmit">
+          <b-row>
+            <b-col lg="6" xs="12">
+              <h3>Red Team</h3>
+              <label for="red-team-defender">Defender</label>
+              <v-select
+                id="red-team-defender"
+                v-validate="'required'"
+                name="red-team-defender"
+                :class="{'is-danger': errors.has('red-team-defender')}"
+                v-model="newGame.redTeam.defender"
+                :options="players"
+                placeholder="Select a defender"
+                class="mb-3"></v-select>
+              <label for="red-team-striker">Striker</label>
+              <v-select
+                id="red-team-striker"
+                v-validate="'required'"
+                name="red-team-striker"
+                :class="{'is-danger': errors.has('red-team-striker')}"
+                v-model="newGame.redTeam.striker"
+                :options="players"
+                placeholder="Select a striker"
+                class="mb-3"></v-select>
+              <label for="red-team-score">Score</label>
+              <b-form-input id="red-team-score" v-validate="'required|min_value:0'" name="red-team-score" :class="{'is-danger': errors.has('red-team-score')}" v-model="newGame.redTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
+            </b-col>
+            <b-col lg="6" xs="12">
+              <h3>Blue Team</h3>
+              <label for="red-team-defender">Defender</label>
+              <v-select
+                id="blue-team-defender"
+                v-validate="'required'"
+                name="blue-team-defender"
+                :class="{'is-danger': errors.has('blue-team-defender')}"
+                v-model="newGame.blueTeam.defender"
+                :options="players"
+                placeholder="Select a defender"
+                class="mb-3"></v-select>
+              <label for="red-team-striker">Striker</label>
+              <v-select
+                id="blue-team-striker"
+                v-validate="'required'"
+                name="blue-team-striker"
+                :class="{'is-danger': errors.has('blue-team-striker')}"
+                v-model="newGame.blueTeam.striker"
+                :options="players"
+                placeholder="Select a striker"
+                class="mb-3"></v-select>
+              <label for="blue-team-score">Score</label>
+              <b-form-input id="blue-team-score" v-validate="'required|min_value:0'" name="blue-team-score" :class="{'is-danger': errors.has('blue-team-score')}" v-model="newGame.blueTeam.score" placeholder="Enter score" type="number" class="mb-3"></b-form-input>
+            </b-col>
+            <b-col lg="12">
+              <label for="site">Site</label>
+              <v-select
+                id="site"
+                name="site"
+                v-validate="'required'"
+                v-model="newGame.site"
+                :options="['Catania','Milan', 'Ragusa']"
+                :class="{'is-danger': errors.has('site')}"
+                class="mb-3"
+                readonly></v-select>
+            </b-col>
+          </b-row>
+        </form>
       </b-modal>
 
       <b-modal id="remove-game" title="Are you sure to remove this game?" @ok="handleRemoveOk" ref="remove-game-modal">
@@ -70,18 +109,19 @@
 </template>
 
 <script>
+  import vSelect from 'vue-select';
 
   const gameModel = () => {
     return {
       redTeam: {
         defender: null,
         striker: null,
-        score: 0,
+        score: null,
       },
       blueTeam: {
         defender: null,
         striker: null,
-        score: 0,
+        score: null,
       },
       site: 'Catania',
     };
@@ -93,7 +133,10 @@
       return {
         playersRef: [],
         games: [],
+        pending: false,
         gameIdToRemove: null,
+        perPage: 10,
+        currentPage: 1,
         tableFields: [
           'redDefender',
           'redStriker',
@@ -102,18 +145,35 @@
           'redScore',
           'blueScore',
           'location',
-          'date',
+          { key: 'date', sortable: true },
           'actions'
         ],
         newGame: { ...gameModel() },
       };
     },
+    components: {
+      'v-select': vSelect,
+    },
     computed: {
       players() {
         return this.playersRef
+          .filter(playersRef => {
+            const id = playersRef.id;
+
+            if (
+              this.newGame.redTeam.defender && this.newGame.redTeam.defender.value === id ||
+              this.newGame.redTeam.striker && this.newGame.redTeam.striker.value === id ||
+              this.newGame.blueTeam.defender && this.newGame.blueTeam.defender.value === id ||
+              this.newGame.blueTeam.striker && this.newGame.blueTeam.striker.value === id
+            ) {
+              return false;
+            }
+
+            return true;
+          })
           .map(playerRef => ({
             value: playerRef.id,
-            text: `${playerRef.data().name} ${playerRef.data().surname}`
+            label: `${playerRef.data().name} ${playerRef.data().surname}`
           }));
       }
     },
@@ -129,7 +189,6 @@
       this.$firestore
         .collection('games')
         .orderBy('timestamp', 'desc')
-        .limit(25)
         .onSnapshot((querySnapshot) => {
           this.games = [];
 
@@ -182,7 +241,8 @@
           this.gameIdToRemove = null;
         });
       },
-      async handleAddOk() {
+      async handleAddOk(event) {
+        event.preventDefault();
         const valid = await this.$validator.validateAll();
 
         if (!valid) {
@@ -190,20 +250,33 @@
           return;
         }
 
+        this.handleSubmit();
+      },
+      async handleSubmit() {
+        if (this.pending) return;
+        this.pending = true;
+
+        const valid = await this.$validator.validateAll();
+        if (!valid) {
+          this.$vueOnToast.pop('error', 'Error', 'Check your data and retry');
+          this.pending = false;
+          return;
+        }
+
         const data = {
           redTeam: {
-            defender: this.$firestore.doc(`players/${this.newGame.redTeam.defender}`),
-            striker: this.$firestore.doc(`players/${this.newGame.redTeam.striker}`),
+            defender: this.$firestore.doc(`players/${this.newGame.redTeam.defender.value}`),
+            striker: this.$firestore.doc(`players/${this.newGame.redTeam.striker.value}`),
             score: parseInt(this.newGame.redTeam.score, 10),
           },
           blueTeam: {
-            defender: this.$firestore.doc(`players/${this.newGame.blueTeam.defender}`),
-            striker: this.$firestore.doc(`players/${this.newGame.blueTeam.striker}`),
+            defender: this.$firestore.doc(`players/${this.newGame.blueTeam.defender.value}`),
+            striker: this.$firestore.doc(`players/${this.newGame.blueTeam.striker.value}`),
             score: parseInt(this.newGame.blueTeam.score, 10),
           },
           timestamp: new Date(),
           // Hardcoded site location
-          site: 'Catania',
+          site: this.newGame.site,
         };
 
         this.$firestore
@@ -211,21 +284,35 @@
           .add(data)
           .then((docRef) => {
             console.debug('Document written with ID: ', docRef.id);
-
-            this.$vueOnToast.pop('success', 'Success', 'Game inserted');
-            this.newGame = { ...gameModel() };
+            // Wrapped in $nextTick to ensure DOM is rendered before closing
+            this.$nextTick(() => {
+              this.$refs['add-game-modal'].hide();
+              this.newGame = { ...gameModel() };
+              this.$vueOnToast.pop('success', 'Success', 'Game inserted');
+            });
           })
           .catch((error) => {
             console.error('Error adding document: ', error);
             this.$vueOnToast.pop('error', 'Error', error.message);
-          });
-      },
+          })
+          .finally(() => {
+            this.pending = false;
+        });
+      }
     }
   };
 </script>
 
-<style scoped>
+<style lang="scss">
   .cursor-pointer {
     cursor: pointer;
+  }
+
+  .is-danger {
+    border-color: #ff6262;
+
+    > .dropdown-toggle {
+      border-color: #ff6262;
+    }
   }
 </style>
