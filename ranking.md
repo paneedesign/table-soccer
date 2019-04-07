@@ -1,4 +1,0 @@
----
-title: Ranking
-component: Ranking
----

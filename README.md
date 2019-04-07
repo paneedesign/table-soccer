@@ -1,28 +1,29 @@
----
-title: Table Soccer
-component: Home
----
+# table-soccer
 
-## Install dependencies
-
-```bash
+## Project setup
+```
 npm install
 ```
 
-## Run DEV server
-
-```bash
-npm run dev
+### Compiles and hot-reloads for development
+```
+npm run serve
 ```
 
-## Build dist
-
-```bash
+### Compiles and minifies for production
+```
 npm run build
 ```
 
-## Deploy to gh-pages branch
+### Lints and fixes files
+```
+npm run lint
+```
 
-```bash
+### Deploy
+```
 npm run deploy
 ```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).

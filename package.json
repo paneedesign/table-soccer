@@ -1,28 +1,46 @@
 {
   "name": "table-soccer",
-  "version": "1.0.0",
-  "description": "",
-  "dependencies": {
-    "vee-validate": "^2.2.0",
-    "vue-on-toast": "^1.0.1",
-    "vue-select": "^2.6.4",
-    "vuepress": "^0.14.10"
-  },
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "dev": "vuepress dev",
-    "build": "vuepress build",
-    "deploy": "vuepress build && sh scripts/deploy.sh"
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "deploy": "sh scripts/deploy.sh"
   },
-  "author": "",
-  "license": "MIT",
+  "dependencies": {
+    "bootstrap-vue": "^2.0.0-rc.16",
+    "core-js": "^2.6.5",
+    "register-service-worker": "^1.6.2",
+    "vee-validate": "^2.2.0",
+    "vue": "^2.6.6",
+    "vue-on-toast": "^1.0.1",
+    "vue-router": "^3.0.1",
+    "vue-select": "^2.6.4",
+    "vuex": "^3.0.1",
+    "firebase": "^5.9.2"
+  },
   "devDependencies": {
-    "axios": "^0.18.0",
-    "bootstrap-vue": "^2.0.0-rc.11",
-    "firebase": "^5.9.2",
+    "@vue/cli-plugin-babel": "^3.5.0",
+    "@vue/cli-plugin-eslint": "^3.5.0",
+    "@vue/cli-plugin-pwa": "^3.5.0",
+    "@vue/cli-service": "^3.5.0",
+    "@vue/eslint-config-airbnb": "^4.0.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.8.0",
+    "eslint-plugin-vue": "^5.0.0",
+    "lint-staged": "^8.1.4",
     "node-sass": "^4.11.0",
     "sass-loader": "^7.1.0",
-    "vue-axios": "^2.1.4",
-    "vuepress": "^0.14.10",
-    "webpack-dev-middleware": "^3.6.0"
+    "vue-template-compiler": "^2.5.21"
+  },
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,vue}": [
+      "vue-cli-service lint",
+      "git add"
+    ]
   }
 }
