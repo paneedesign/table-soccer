@@ -2,9 +2,9 @@ import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
 import VeeValidate from 'vee-validate';
 import VueOnToast from 'vue-on-toast';
-import firebaseVueInstall from './services/firebase';
 import App from './App.vue';
 import router from './router';
+import firebaseVueInstall from './services/firebase';
 
 import './assets/scss/main.scss';
 // import store from './store';

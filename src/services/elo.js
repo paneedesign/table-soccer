@@ -3,12 +3,11 @@ const getRatingDelta = (myRating, opponentRating, myGameResult) => {
     return null;
   }
   const kFactor = 16;
-  const myChanceToWin = 1 / (1 + Math.pow(10, (opponentRating - myRating) / 400));
+  const myChanceToWin = 1 / (1 + (10 ** ((opponentRating - myRating) / 400)));
   return Math.round(kFactor * (myGameResult - myChanceToWin));
 };
 
-const getNewRating = (myRating, opponentRating, myGameResult) => {
-  return myRating + getRatingDelta(myRating, opponentRating, myGameResult);
-};
+const getNewRating = (myRating, opponentRating, myGameResult) => myRating
+  + getRatingDelta(myRating, opponentRating, myGameResult);
 
 export { getRatingDelta, getNewRating };

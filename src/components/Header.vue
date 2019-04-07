@@ -19,39 +19,39 @@
 </template>
 
 <script>
-  export default {
-    name: 'Header',
-    data() {
-      return {
-        user: null,
-      }
-    },
-    firebaseReady() {
-      this.$firebase.auth().onAuthStateChanged((user) => {
-        this.user = user;
+export default {
+  name: 'Header',
+  data() {
+    return {
+      user: null,
+    };
+  },
+  firebaseReady() {
+    this.$firebase.auth().onAuthStateChanged((user) => {
+      this.user = user;
+    });
+  },
+  methods: {
+    signInWithGoogle() {
+      const provider = new this.$firebase.auth.GoogleAuthProvider();
+      this.$firebase.auth().signInWithPopup(provider).then((result) => {
+        this.user = result;
+        this.$vueOnToast.pop('success', 'Success', 'Signed in successfully');
+      }).catch((error) => {
+        this.$vueOnToast.pop('error', 'Error', error.message);
+        console.error(error);
       });
     },
-    methods: {
-      signInWithGoogle() {
-        const provider = new this.$firebase.auth.GoogleAuthProvider();
-        this.$firebase.auth().signInWithPopup(provider).then((result) => {
-          this.user = result;
-          this.$vueOnToast.pop('success', 'Success', 'Signed in successfully');
-        }).catch((error) => {
-          this.$vueOnToast.pop('error', 'Error', error.message);
-          console.error(error);
-        });
-      },
-      signOut() {
-        this.$firebase.auth().signOut().then(() => {
-          this.user = null;
-          this.$vueOnToast.pop('success', 'Success', 'Signed out successfully');
-          console.log('Sign out successfully');
-        }).catch((error) => {
-          this.$vueOnToast.pop('error', 'Error', error.message);
-          console.error( error);
-        });
-      }
+    signOut() {
+      this.$firebase.auth().signOut().then(() => {
+        this.user = null;
+        this.$vueOnToast.pop('success', 'Success', 'Signed out successfully');
+        console.log('Sign out successfully');
+      }).catch((error) => {
+        this.$vueOnToast.pop('error', 'Error', error.message);
+        console.error(error);
+      });
     },
-  };
+  },
+};
 </script>

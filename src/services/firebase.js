@@ -1,4 +1,4 @@
-export default function install (Vue) {
+export default function install(Vue) {
   if (install.installed) {
     return;
   }
@@ -6,7 +6,7 @@ export default function install (Vue) {
   install.installed = true;
 
   Vue.mixin({
-    created: async function () {
+    async created() {
       if (typeof this.$options.firebaseReady === 'function') {
         const firebase = await import('firebase/app');
         await import('firebase/auth');
@@ -30,6 +30,6 @@ export default function install (Vue) {
         this.$firebase = firebase;
         this.$options.firebaseReady.call(this);
       }
-    }
+    },
   });
 }

@@ -7,7 +7,7 @@ Vue.use(Router);
 
 export default new Router({
   mode: 'history',
-  base: '/table-soccer/',
+  base: '/',
   title: 'P&D Table Soccer',
   routes: [
     {
