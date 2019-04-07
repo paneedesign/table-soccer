@@ -1,9 +1,12 @@
 <template>
   <div>
     <ClientOnly>
-      <b-row>
-        <b-col xs="12" class="mb-3">
-          <b-button v-b-modal.modal-prevent.add-game>Add new game</b-button>
+      <b-row class="align-items-center mb-3 pt-3">
+        <b-col xs="6">
+          <h4 class="mb-0">Game list</h4>
+        </b-col>
+        <b-col xs="6" class="mb-3 text-right">
+          <b-button v-b-modal.modal-prevent.add-game>Add game</b-button>
         </b-col>
       </b-row>
 
