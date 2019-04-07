@@ -5,7 +5,6 @@
       <router-view/>
       <site-footer/>
     </b-container>
-    <toast-container></toast-container>
   </div>
 </template>
 

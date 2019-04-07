@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
 import VeeValidate from 'vee-validate';
-import VueOnToast from 'vue-on-toast';
+import Toasted from 'vue-toasted';
 import App from './App.vue';
 import router from './router';
 import firebaseVueInstall from './services/firebase';
@@ -14,8 +14,12 @@ Vue.config.productionTip = false;
 
 Vue.use(BootstrapVue);
 Vue.use(VeeValidate, { fieldsBagName: 'formFields' });
-Vue.use(VueOnToast);
 Vue.use(firebaseVueInstall);
+Vue.use(Toasted, {
+  theme: 'bubble',
+  position: 'top-center',
+  duration: 4000,
+});
 
 new Vue({
   router,

@@ -268,12 +268,12 @@ export default {
     handleRemoveOk() {
       this.$firestore.collection('games').doc(this.gameIdToRemove).delete().then(() => {
         console.debug('Document successfully deleted!');
-        this.$vueOnToast.pop('success', 'Success', 'Game Removed');
+        this.$toasted.show('Success: Game Removed', { type: 'success' });
         this.gameIdToRemove = null;
       })
         .catch((error) => {
           console.error('Error removing document: ', error);
-          this.$vueOnToast.pop('error', 'Error', error.message);
+          this.$toasted.show(`Error: ${error.message}`, { type: 'error' });
           this.gameIdToRemove = null;
         });
     },
@@ -282,7 +282,7 @@ export default {
       const valid = await this.$validator.validateAll();
 
       if (!valid) {
-        this.$vueOnToast.pop('error', 'Error', 'Check your data and retry');
+        this.$toasted.show('Error: Check your data and retry', { type: 'error' });
         return;
       }
 
@@ -294,7 +294,7 @@ export default {
 
       const valid = await this.$validator.validateAll();
       if (!valid) {
-        this.$vueOnToast.pop('error', 'Error', 'Check your data and retry');
+        this.$toasted.show('Error: Check your data and retry', { type: 'error' });
         this.pending = false;
         return;
       }
@@ -324,12 +324,12 @@ export default {
           this.$nextTick(() => {
             this.$refs['add-game-modal'].hide();
             this.newGame = { ...gameModel() };
-            this.$vueOnToast.pop('success', 'Success', 'Game inserted');
+            this.$toasted.show('Success: Game inserted', { type: 'success' });
           });
         })
         .catch((error) => {
           console.error('Error adding document: ', error);
-          this.$vueOnToast.pop('error', 'Error', error.message);
+          this.$toasted.show(`Error: ${error.message}`, { type: 'error' });
         })
         .finally(() => {
           this.pending = false;

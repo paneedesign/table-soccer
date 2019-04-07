@@ -36,19 +36,19 @@ export default {
       const provider = new this.$firebase.auth.GoogleAuthProvider();
       this.$firebase.auth().signInWithPopup(provider).then((result) => {
         this.user = result;
-        this.$vueOnToast.pop('success', 'Success', 'Signed in successfully');
+        this.$toasted.show('Success: Signed in successfully', { type: 'success' });
       }).catch((error) => {
-        this.$vueOnToast.pop('error', 'Error', error.message);
+        this.$toasted.show(`Error: ${error.message}`, { type: 'error' });
         console.error(error);
       });
     },
     signOut() {
       this.$firebase.auth().signOut().then(() => {
         this.user = null;
-        this.$vueOnToast.pop('success', 'Success', 'Signed out successfully');
+        this.$toasted.show('Success: Signed out successfully', { type: 'success' });
         console.log('Sign out successfully');
       }).catch((error) => {
-        this.$vueOnToast.pop('error', 'Error', error.message);
+        this.$toasted.show(`Error: ${error.message}`, { type: 'error' });
         console.error(error);
       });
     },

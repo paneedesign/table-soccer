@@ -1,6 +1,5 @@
 @import "~bootstrap/dist/css/bootstrap";
 @import "~bootstrap-vue/dist/bootstrap-vue";
-@import '~vue-on-toast/dist/vue-on-toast.css';
 
 a {
   color: rgba(0, 0, 0, .5);
@@ -10,14 +9,4 @@ a {
     color: rgba(0, 0, 0, .7);
     text-decoration: none;
   }
-}
-
-.toast.vot-success {
-  opacity: 1;
-  background-color: var(--green);
-}
-
-.toast.vot-error {
-  opacity: 1;
-  background-color: var(--red);
 }
