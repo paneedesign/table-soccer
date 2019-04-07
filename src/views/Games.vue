@@ -1,10 +1,10 @@
 <template>
   <div>
-    <b-row class="align-items-center mb-3 pt-3">
+    <b-row class="align-items-center mb-4 pt-3">
       <b-col xs="6">
         <h4 class="mb-0">Game list</h4>
       </b-col>
-      <b-col xs="6" class="mb-3 text-right">
+      <b-col xs="6" class="text-right">
         <b-button v-b-modal.modal-prevent.add-game>Add game</b-button>
       </b-col>
     </b-row>
@@ -320,10 +320,11 @@ export default {
         .add(data)
         .then((docRef) => {
           console.debug('Document written with ID: ', docRef.id);
-          // Wrapped in $nextTick to ensure DOM is rendered before closing
+
           this.$nextTick(() => {
             this.$refs['add-game-modal'].hide();
             this.newGame = { ...gameModel() };
+            this.errors.clear();
             this.$toasted.show('Success: Game inserted', { type: 'success' });
           });
         })
