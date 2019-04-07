@@ -26,6 +26,11 @@ export default new Router({
       component: () => import(/* webpackChunkName: "ranking" */ './views/Ranking.vue'),
     },
     {
+      path: '/profile',
+      name: 'profile',
+      component: () => import(/* webpackChunkName: "profile" */ './views/Profile.vue'),
+    },
+    {
       path: '*',
       component: NotFound,
     },

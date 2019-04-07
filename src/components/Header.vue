@@ -11,8 +11,17 @@
             </b-navbar-nav>
 
             <b-navbar-nav class="ml-auto">
-                <b-nav-item @click="signInWithGoogle" v-if="!user">Sign in with Google</b-nav-item>
-                <b-nav-item @click="signOut" v-if="user">Sign out</b-nav-item>
+                <b-nav-item
+                  @click="signInWithGoogle"
+                  v-if="!player">Sign in with Google</b-nav-item>
+                <div class="d-flex align-items-center" v-if="player">
+                  <b-link class="d-flex align-items-center" to="/profile">
+                    <div class="mr-2">
+                      <span>{{ player.fullName }}</span>
+                    </div>
+                    <b-img :src="player.picture" rounded="circle" width="30" height="30"></b-img>
+                  </b-link>
+                </div>
             </b-navbar-nav>
         </b-collapse>
     </b-navbar>
@@ -23,34 +32,81 @@ export default {
   name: 'Header',
   data() {
     return {
-      user: null,
+      player: null,
     };
   },
   firebaseReady() {
-    this.$firebase.auth().onAuthStateChanged((user) => {
-      this.user = user;
+    this.$firebase.auth().onAuthStateChanged(async (user) => {
+      if (user) {
+        this.player = await this.getPlayer(user);
+      }
     });
   },
   methods: {
     signInWithGoogle() {
       const provider = new this.$firebase.auth.GoogleAuthProvider();
-      this.$firebase.auth().signInWithPopup(provider).then((result) => {
-        this.user = result;
-        this.$toasted.show('Success: Signed in successfully', { type: 'success' });
+      this.$firebase.auth().signInWithPopup(provider).then(async (result) => {
+        if (result.user) {
+          let player = await this.getPlayer(result.user);
+
+          if (!player) {
+            console.debug('Player not found, creating new player');
+            player = await this.createPlayer(result.user);
+          }
+
+          this.user = result.user;
+          this.player = player;
+
+          console.log(this.player);
+          this.$toasted.show('Success: Signed in successfully', { type: 'success' });
+        }
       }).catch((error) => {
         this.$toasted.show(`Error: ${error.message}`, { type: 'error' });
         console.error(error);
       });
     },
-    signOut() {
-      this.$firebase.auth().signOut().then(() => {
-        this.user = null;
-        this.$toasted.show('Success: Signed out successfully', { type: 'success' });
-        console.log('Sign out successfully');
-      }).catch((error) => {
-        this.$toasted.show(`Error: ${error.message}`, { type: 'error' });
-        console.error(error);
-      });
+    // Google logged user -> Firebase User
+    async getPlayer(user) {
+      return this.$firestore
+        .collection('users')
+        .where('uid', '==', user.uid)
+        .get()
+        .then((querySnapshot) => {
+          let player = null;
+
+          querySnapshot.forEach((doc) => {
+            player = doc.data();
+          });
+
+          return player;
+        })
+        .catch((error) => {
+          this.$toasted.show(`Error: ${error.message}`, { type: 'error' });
+        });
+    },
+    // Google logged user -> Firebase new User
+    async createPlayer(user) {
+      const data = {
+        uid: user.uid,
+        email: user.email,
+        fullName: user.displayName,
+        picture: user.photoURL,
+        role: 'Any',
+        createdAt: new Date(),
+        lastUpdateOn: new Date(),
+      };
+
+      return this.$firestore
+        .collection('users')
+        .add(data)
+        .then((docRef) => {
+          console.debug('Document (Player) written with ID: ', docRef.id);
+          return data;
+        })
+        .catch((error) => {
+          console.error('Error creating player: ', error);
+          this.$toasted.show(`Error: ${error.message}`, { type: 'error' });
+        });
     },
   },
 };
