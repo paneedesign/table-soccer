@@ -94,6 +94,7 @@ export default {
         role: 'Any',
         createdAt: new Date(),
         lastUpdateOn: new Date(),
+        enabled: false,
       };
 
       return this.$firestore

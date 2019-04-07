@@ -87,6 +87,7 @@ export default {
 
       const data = {
         role: this.newRole,
+        lastUpdateOn: new Date(),
       };
 
       this.$firestore
