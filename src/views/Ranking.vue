@@ -232,7 +232,7 @@ export default {
       return Object.keys(rankingObject).map((key) => {
         const player = this.playersRef.find(playerRef => playerRef.id === key).data();
         return {
-          player: `${player.name} ${player.surname.charAt(0).toUpperCase()}.`,
+          player: player.fullName,
           played: rankingObject[key].played,
           score: rankingObject[key].rating,
           won: rankingObject[key].won,
@@ -249,8 +249,8 @@ export default {
         striker = this.playersRef.find(player => player.id === striker).data();
 
         return {
-          defender: `${defender.name} ${defender.surname.charAt(0).toUpperCase()}.`,
-          striker: `${striker.name} ${striker.surname.charAt(0).toUpperCase()}.`,
+          defender: defender.fullName,
+          striker: striker.fullName,
           played: rankingObject[key].played,
           won: rankingObject[key].won,
           lost: rankingObject[key].played - rankingObject[key].won,

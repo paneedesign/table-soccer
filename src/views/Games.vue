@@ -143,6 +143,7 @@
 
 <script>
 import vSelect from 'vue-select';
+import parseFullName from '../utils/parseFullName';
 
 const gameModel = () => ({
   redTeam: {
@@ -204,14 +205,14 @@ export default {
         })
         .map(playerRef => ({
           value: playerRef.id,
-          label: `${playerRef.data().name} ${playerRef.data().surname}`,
+          label: playerRef.data().fullName,
         }));
     },
   },
   async firebaseReady() {
     await this.$firestore
       .collection('players')
-      .orderBy('name', 'asc')
+      .orderBy('fullName', 'asc')
       .get()
       .then((querySnapshot) => {
         querySnapshot.forEach(doc => this.playersRef.push(doc));
@@ -243,10 +244,10 @@ export default {
 
       return {
         id: gameRef.id,
-        redDefender: `${redDefender.name} ${redDefender.surname.charAt(0).toUpperCase()}.`,
-        redStriker: `${redStriker.name} ${redStriker.surname.charAt(0).toUpperCase()}.`,
-        blueDefender: `${blueDefender.name} ${blueDefender.surname.charAt(0).toUpperCase()}.`,
-        blueStriker: `${blueStriker.name} ${blueStriker.surname.charAt(0).toUpperCase()}.`,
+        redDefender: parseFullName(redDefender.fullName),
+        redStriker: parseFullName(redStriker.fullName),
+        blueDefender: parseFullName(blueDefender.fullName),
+        blueStriker: parseFullName(blueStriker.fullName),
         redScore: game.redTeam.score,
         blueScore: game.blueTeam.score,
         location: `🌇 ${game.site}`,
