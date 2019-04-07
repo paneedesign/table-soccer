@@ -51,6 +51,7 @@
 
 <script>
 import * as Elo from '../services/elo';
+import parseFullName from '../utils/parseFullName';
 
 export default {
   name: 'Ranking',
@@ -89,7 +90,7 @@ export default {
   async firebaseReady() {
     await this.$firestore
       .collection('players')
-      .orderBy('name', 'asc')
+      .orderBy('fullName', 'asc')
       .get()
       .then((querySnapshot) => {
         querySnapshot.forEach(doc => this.playersRef.push(doc));
@@ -232,7 +233,7 @@ export default {
       return Object.keys(rankingObject).map((key) => {
         const player = this.playersRef.find(playerRef => playerRef.id === key).data();
         return {
-          player: player.fullName,
+          player: parseFullName(player.fullName),
           played: rankingObject[key].played,
           score: rankingObject[key].rating,
           won: rankingObject[key].won,
@@ -249,8 +250,8 @@ export default {
         striker = this.playersRef.find(player => player.id === striker).data();
 
         return {
-          defender: defender.fullName,
-          striker: striker.fullName,
+          defender: parseFullName(defender.fullName),
+          striker: parseFullName(striker.fullName),
           played: rankingObject[key].played,
           won: rankingObject[key].won,
           lost: rankingObject[key].played - rankingObject[key].won,
