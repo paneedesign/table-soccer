@@ -19,6 +19,8 @@
 </template>
 
 <script>
+import { firebase } from '../firebase';
+
 export default {
   name: 'Header',
   data() {
@@ -26,15 +28,15 @@ export default {
       user: null,
     };
   },
-  firebaseReady() {
-    this.$firebase.auth().onAuthStateChanged((user) => {
+  mounted() {
+    firebase.auth().onAuthStateChanged((user) => {
       this.user = user;
     });
   },
   methods: {
     signInWithGoogle() {
-      const provider = new this.$firebase.auth.GoogleAuthProvider();
-      this.$firebase.auth().signInWithPopup(provider).then((result) => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      firebase.auth().signInWithPopup(provider).then((result) => {
         this.user = result;
         this.$toasted.show('Success: Signed in successfully', { type: 'success' });
       }).catch((error) => {
@@ -43,7 +45,7 @@ export default {
       });
     },
     signOut() {
-      this.$firebase.auth().signOut().then(() => {
+      firebase.auth().signOut().then(() => {
         this.user = null;
         this.$toasted.show('Success: Signed out successfully', { type: 'success' });
         console.log('Sign out successfully');
