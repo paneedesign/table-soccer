@@ -19,7 +19,7 @@
                     <div class="mr-2">
                       <span>{{ player.fullName }}</span>
                     </div>
-                    <b-img :src="player.picture" rounded="circle" width="30" height="30"></b-img>
+                    <b-img :src="player.pictureUrl" rounded="circle" width="30" height="30"></b-img>
                   </b-link>
                 </div>
             </b-navbar-nav>
@@ -92,7 +92,7 @@ export default {
         uid: user.uid,
         email: user.email,
         fullName: user.displayName,
-        picture: user.photoURL,
+        pictureUrl: user.photoURL,
         role: 'Any',
         createdAt: new Date(),
         lastUpdateOn: new Date(),
