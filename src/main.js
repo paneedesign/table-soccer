@@ -2,19 +2,18 @@ import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
 import VeeValidate from 'vee-validate';
 import Toasted from 'vue-toasted';
+
 import App from './App.vue';
 import router from './router';
-import firebaseVueInstall from './services/firebase';
+import store from './store';
 
 import './assets/scss/main.scss';
-// import store from './store';
 // import './registerServiceWorker';
 
 Vue.config.productionTip = false;
 
 Vue.use(BootstrapVue);
 Vue.use(VeeValidate, { fieldsBagName: 'formFields' });
-Vue.use(firebaseVueInstall);
 Vue.use(Toasted, {
   theme: 'bubble',
   position: 'top-center',
@@ -23,6 +22,6 @@ Vue.use(Toasted, {
 
 new Vue({
   router,
-  // store,
+  store,
   render: h => h(App),
 }).$mount('#app');

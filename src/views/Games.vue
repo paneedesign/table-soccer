@@ -11,13 +11,13 @@
 
     <b-row>
       <b-col lg="12">
-        <div v-if="games.length">
+        <div v-if="$store.state.gamesRef.length">
           <b-table
             id="games-table"
             responsive
             striped
             hover
-            :items="games"
+            :items="$store.getters.parsedGames"
             :fields="tableFields"
             :per-page="perPage"
             :current-page="currentPage">
@@ -31,7 +31,7 @@
           <b-pagination
             align="center"
             v-model="currentPage"
-            :total-rows="games.length"
+            :total-rows="$store.getters.parsedGames.length"
             :per-page="perPage"
             aria-controls="games-table"
           ></b-pagination>
@@ -143,6 +143,8 @@
 
 <script>
 import vSelect from 'vue-select';
+import { firestore } from '../firebase';
+import { parseDate } from '../utils/parse';
 
 const gameModel = () => ({
   redTeam: {
@@ -162,8 +164,6 @@ export default {
   name: 'Games',
   data() {
     return {
-      playersRef: [],
-      games: [],
       pending: false,
       gameIdToRemove: null,
       perPage: 10,
@@ -187,7 +187,7 @@ export default {
   },
   computed: {
     players() {
-      return this.playersRef
+      return this.$store.state.playersRef
         .filter((playersRef) => {
           const { id } = playersRef;
 
@@ -204,61 +204,17 @@ export default {
         })
         .map(playerRef => ({
           value: playerRef.id,
-          label: `${playerRef.data().name} ${playerRef.data().surname}`,
+          label: playerRef.data().fullName,
         }));
     },
   },
-  async firebaseReady() {
-    await this.$firestore
-      .collection('players')
-      .orderBy('name', 'asc')
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach(doc => this.playersRef.push(doc));
-      });
-
-    this.$firestore
-      .collection('games')
-      .orderBy('timestamp', 'desc')
-      .onSnapshot((querySnapshot) => {
-        this.games = [];
-
-        querySnapshot.forEach((doc) => {
-          this.games.push(this.parseGame(doc));
-        });
-      });
+  async mounted() {
+    this.$store.dispatch('getGames');
   },
   methods: {
-    parseGame(gameRef) {
-      const game = gameRef.data();
-      const redDefender = this.playersRef
-        .find(player => player.id === game.redTeam.defender.id).data();
-      const redStriker = this.playersRef
-        .find(player => player.id === game.redTeam.striker.id).data();
-      const blueDefender = this.playersRef
-        .find(player => player.id === game.blueTeam.defender.id).data();
-      const blueStriker = this.playersRef
-        .find(player => player.id === game.blueTeam.striker.id).data();
-      const date = this.formatDate(game.timestamp.toDate());
-
-      return {
-        id: gameRef.id,
-        redDefender: `${redDefender.name} ${redDefender.surname.charAt(0).toUpperCase()}.`,
-        redStriker: `${redStriker.name} ${redStriker.surname.charAt(0).toUpperCase()}.`,
-        blueDefender: `${blueDefender.name} ${blueDefender.surname.charAt(0).toUpperCase()}.`,
-        blueStriker: `${blueStriker.name} ${blueStriker.surname.charAt(0).toUpperCase()}.`,
-        redScore: game.redTeam.score,
-        blueScore: game.blueTeam.score,
-        location: `🌇 ${game.site}`,
-        date,
-      };
-    },
-    formatDate(date) {
-      return `${date.getDate()}\\${date.getMonth()}\\${date.getFullYear()}`;
-    },
     canRemoveGame(game) {
       const { date } = game;
-      return date === this.formatDate(new Date());
+      return date === parseDate(new Date());
     },
     handleRemoveGame(game) {
       const { id } = game;
@@ -266,7 +222,7 @@ export default {
       this.$refs['remove-game-modal'].show();
     },
     handleRemoveOk() {
-      this.$firestore.collection('games').doc(this.gameIdToRemove).delete().then(() => {
+      firestore.collection('games').doc(this.gameIdToRemove).delete().then(() => {
         console.debug('Document successfully deleted!');
         this.$toasted.show('Success: Game Removed', { type: 'success' });
         this.gameIdToRemove = null;
@@ -301,21 +257,20 @@ export default {
 
       const data = {
         redTeam: {
-          defender: this.$firestore.doc(`players/${this.newGame.redTeam.defender.value}`),
-          striker: this.$firestore.doc(`players/${this.newGame.redTeam.striker.value}`),
+          defender: firestore.doc(`players/${this.newGame.redTeam.defender.value}`),
+          striker: firestore.doc(`players/${this.newGame.redTeam.striker.value}`),
           score: parseInt(this.newGame.redTeam.score, 10),
         },
         blueTeam: {
-          defender: this.$firestore.doc(`players/${this.newGame.blueTeam.defender.value}`),
-          striker: this.$firestore.doc(`players/${this.newGame.blueTeam.striker.value}`),
+          defender: firestore.doc(`players/${this.newGame.blueTeam.defender.value}`),
+          striker: firestore.doc(`players/${this.newGame.blueTeam.striker.value}`),
           score: parseInt(this.newGame.blueTeam.score, 10),
         },
         timestamp: new Date(),
-        // Hardcoded site location
         site: this.newGame.site,
       };
 
-      this.$firestore
+      firestore
         .collection('games')
         .add(data)
         .then((docRef) => {

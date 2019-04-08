@@ -28,6 +28,8 @@
 </template>
 
 <script>
+import { firebase, firestore } from '../firebase';
+
 export default {
   name: 'Header',
   data() {
@@ -35,8 +37,8 @@ export default {
       player: null,
     };
   },
-  firebaseReady() {
-    this.$firebase.auth().onAuthStateChanged(async (user) => {
+  mounted() {
+    firebase.auth().onAuthStateChanged(async (user) => {
       if (user) {
         this.player = await this.getPlayer(user);
       }
@@ -44,8 +46,8 @@ export default {
   },
   methods: {
     signInWithGoogle() {
-      const provider = new this.$firebase.auth.GoogleAuthProvider();
-      this.$firebase.auth().signInWithPopup(provider).then(async (result) => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      firebase.auth().signInWithPopup(provider).then(async (result) => {
         if (result.user) {
           let player = await this.getPlayer(result.user);
 
@@ -67,7 +69,7 @@ export default {
     },
     // Google logged user -> Firebase User
     async getPlayer(user) {
-      return this.$firestore
+      return firestore
         .collection('users')
         .where('uid', '==', user.uid)
         .get()
@@ -97,7 +99,7 @@ export default {
         enabled: false,
       };
 
-      return this.$firestore
+      return firestore
         .collection('users')
         .add(data)
         .then((docRef) => {
