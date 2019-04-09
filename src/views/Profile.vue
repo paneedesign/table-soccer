@@ -138,7 +138,7 @@ export default {
     signOut() {
       firebase.auth().signOut().then(() => {
         this.player = null;
-        this.$router.push('games');
+        this.$router.go();
         this.$toasted.show('Success: Signed out successfully', { type: 'success' });
         console.log('Sign out successfully');
       }).catch((error) => {

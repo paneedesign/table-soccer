@@ -132,7 +132,7 @@ export default {
     parseFullName(item) {
       return parseFullName(item.fullName);
     },
-  }
+  },
 };
 </script>
 
