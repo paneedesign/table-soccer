@@ -16,6 +16,20 @@
               <template slot="position" slot-scope="data">
                 {{ data.index + 1 }}
               </template>
+              <template slot="player" slot-scope="data">
+                <div class="d-flex align-items-center">
+                  <b-img
+                    v-if="data.item.player.pictureUrl"
+                    class="mr-2"
+                    :src="data.item.player.pictureUrl"
+                    rounded="circle"
+                    width="35"
+                    height="35" />
+                  <div>
+                    <span>{{ parseFullName(data.item.player) }}</span>
+                  </div>
+                </div>
+              </template>
             </b-table>
             <h4 v-else class="text-center">
               <b-spinner></b-spinner>
@@ -38,6 +52,34 @@
               <template slot="position" slot-scope="data">
                 {{ data.index + 1 }}
               </template>
+              <template slot="defender" slot-scope="data">
+                <div class="d-flex align-items-center">
+                  <b-img
+                    v-if="data.item.defender.pictureUrl"
+                    class="mr-2"
+                    :src="data.item.defender.pictureUrl"
+                    rounded="circle"
+                    width="20"
+                    height="20" />
+                  <div>
+                    <span>{{ parseFullName(data.item.defender) }}</span>
+                  </div>
+                </div>
+              </template>
+              <template slot="striker" slot-scope="data">
+                <div class="d-flex align-items-center">
+                  <b-img
+                    v-if="data.item.striker.pictureUrl"
+                    class="mr-2"
+                    :src="data.item.striker.pictureUrl"
+                    rounded="circle"
+                    width="20"
+                    height="20" />
+                  <div>
+                    <span>{{ parseFullName(data.item.striker) }}</span>
+                  </div>
+                </div>
+              </template>
             </b-table>
             <h4 v-else class="text-center">
               <b-spinner></b-spinner>
@@ -50,6 +92,8 @@
 </template>
 
 <script>
+import { parseFullName } from '../utils/parse';
+
 export default {
   name: 'Ranking',
   data() {
@@ -84,6 +128,11 @@ export default {
   async mounted() {
     this.$store.dispatch('getGames');
   },
+  methods: {
+    parseFullName(item) {
+      return parseFullName(item.fullName);
+    },
+  }
 };
 </script>
 

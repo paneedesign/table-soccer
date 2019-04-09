@@ -21,10 +21,10 @@ const parseGames = (gamesRef, playersRef) => {
 
     games.push({
       id: gameRef.id,
-      redDefender: parseFullName(redDefender.fullName),
-      redStriker: parseFullName(redStriker.fullName),
-      blueDefender: parseFullName(blueDefender.fullName),
-      blueStriker: parseFullName(blueStriker.fullName),
+      redDefender,
+      redStriker,
+      blueDefender,
+      blueStriker,
       redScore: game.redTeam.score,
       blueScore: game.blueTeam.score,
       location: `🌇 ${game.site}`,
@@ -39,7 +39,7 @@ const parseGames = (gamesRef, playersRef) => {
 const parsePlayerRanking = (rankingObject, playersRef) => Object.keys(rankingObject).map((key) => {
   const player = playersRef.find(playerRef => playerRef.id === key).data();
   return {
-    player: parseFullName(player.fullName),
+    player,
     played: rankingObject[key].played,
     score: rankingObject[key].rating,
     won: rankingObject[key].won,
@@ -55,8 +55,8 @@ const parseTeamRanking = (rankingObject, playersRef) => Object.keys(rankingObjec
   striker = playersRef.find(player => player.id === striker).data();
 
   return {
-    defender: parseFullName(defender.fullName),
-    striker: parseFullName(striker.fullName),
+    defender,
+    striker,
     played: rankingObject[key].played,
     won: rankingObject[key].won,
     lost: rankingObject[key].played - rankingObject[key].won,
