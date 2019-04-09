@@ -68,7 +68,7 @@ export default {
     // Google logged user -> Firebase User
     async getPlayer(user) {
       return firestore
-        .collection('users')
+        .collection('players')
         .where('uid', '==', user.uid)
         .get()
         .then((querySnapshot) => {
@@ -98,7 +98,7 @@ export default {
       };
 
       return firestore
-        .collection('users')
+        .collection('players')
         .add(data)
         .then((docRef) => {
           console.debug('Document (Player) written with ID: ', docRef.id);

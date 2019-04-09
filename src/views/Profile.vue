@@ -94,7 +94,7 @@ export default {
       };
 
       firestore
-        .collection('users')
+        .collection('players')
         .doc(this.player.id)
         .update(data)
         .then((response) => {
@@ -118,7 +118,7 @@ export default {
     },
     async getPlayer(user) {
       return firestore
-        .collection('users')
+        .collection('players')
         .where('uid', '==', user.uid)
         .get()
         .then((querySnapshot) => {
