@@ -20,7 +20,9 @@
             :items="$store.getters.parsedGames"
             :fields="tableFields"
             :per-page="perPage"
-            :current-page="currentPage">
+            :current-page="currentPage"
+            :sort-by.sync="gamesSortBy"
+            :sort-desc.sync="gamesSortDesc">
             <template slot="actions" slot-scope="data">
               <div class="text-center cursor-pointer">
                 <span @click="handleRemoveGame(data.item)"
@@ -144,7 +146,6 @@
 <script>
 import vSelect from 'vue-select';
 import { firestore } from '../firebase';
-import { parseDate } from '../utils/parse';
 
 const gameModel = () => ({
   redTeam: {
@@ -176,9 +177,11 @@ export default {
         'redScore',
         'blueScore',
         'location',
-        { key: 'date', sortable: true },
+        { key: 'parsedDate', label: 'Date', sortable: true },
         'actions',
       ],
+      gamesSortBy: 'parsedDate',
+      gamesSortDesc: true,
       newGame: { ...gameModel() },
     };
   },
@@ -213,8 +216,11 @@ export default {
   },
   methods: {
     canRemoveGame(game) {
-      const { date } = game;
-      return date === parseDate(new Date());
+      const { timestamp } = game;
+      const today = new Date();
+      return timestamp.getDate() === today.getDate()
+        && timestamp.getMonth() === today.getMonth()
+        && timestamp.getFullYear() === today.getFullYear();
     },
     handleRemoveGame(game) {
       const { id } = game;

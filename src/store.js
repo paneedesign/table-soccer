@@ -82,7 +82,7 @@ export default new Vuex.Store({
 
       firestore
         .collection('games')
-        .orderBy('timestamp', 'desc')
+        .orderBy('timestamp', 'asc')
         .onSnapshot((querySnapshot) => {
           const gamesRef = [];
           querySnapshot.forEach(doc => gamesRef.push(doc));

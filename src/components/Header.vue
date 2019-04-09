@@ -56,9 +56,7 @@ export default {
             player = await this.createPlayer(result.user);
           }
 
-          this.user = result.user;
           this.player = player;
-
           console.log(this.player);
           this.$toasted.show('Success: Signed in successfully', { type: 'success' });
         }

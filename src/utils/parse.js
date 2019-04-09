@@ -3,7 +3,7 @@ const parseFullName = (fullName) => {
   return `${name} ${surname.charAt(0).toUpperCase()}. ${other.map(o => `${o.charAt(0).toUpperCase()}.`)}`;
 };
 
-const parseDate = date => `${date.getDate()}\\${date.getMonth()}\\${date.getFullYear()}`;
+const parseDate = date => `${`${date.getDate() < 10 ? '0' : ''}${date.getDate()}/${`${date.getMonth() < 10 ? '0' : ''}${date.getMonth()}`}`}/${date.getFullYear()} ${date.getHours()}:${`${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}`}`;
 
 const parseGames = (gamesRef, playersRef) => {
   const games = [];
@@ -18,7 +18,6 @@ const parseGames = (gamesRef, playersRef) => {
       .find(player => player.id === game.blueTeam.defender.id).data();
     const blueStriker = playersRef
       .find(player => player.id === game.blueTeam.striker.id).data();
-    const date = parseDate(game.timestamp.toDate());
 
     games.push({
       id: gameRef.id,
@@ -29,7 +28,8 @@ const parseGames = (gamesRef, playersRef) => {
       redScore: game.redTeam.score,
       blueScore: game.blueTeam.score,
       location: `🌇 ${game.site}`,
-      date,
+      timestamp: game.timestamp.toDate(),
+      parsedDate: parseDate(game.timestamp.toDate()),
     });
   });
 
