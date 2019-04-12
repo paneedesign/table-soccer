@@ -66,6 +66,7 @@ export default new Vuex.Store({
       commit(mutationTypes.GET_PLAYERS_START);
       return firestore
         .collection('players')
+        .where('enabled', '==', true)
         .orderBy('fullName', 'asc')
         .get()
         .then((querySnapshot) => {

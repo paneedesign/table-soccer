@@ -5,9 +5,9 @@ service cloud.firestore {
       allow create, update, delete: if exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
 
-    match /users/{user} {
+    match /players/{player} {
       allow read, create: if true;
-      allow update: if request.auth.uid == user.uid;
+      allow update: if request.auth.uid == player.uid;
       allow delete: if false;
     }
   }

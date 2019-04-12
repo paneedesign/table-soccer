@@ -57,7 +57,6 @@ export default {
           }
 
           this.player = player;
-          console.log(this.player);
           this.$toasted.show('Success: Signed in successfully', { type: 'success' });
         }
       }).catch((error) => {
