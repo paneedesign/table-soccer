@@ -8,7 +8,7 @@ Vue.use(Router);
 export default new Router({
   mode: 'history',
   base: '/',
-  title: 'P&D Table Soccer',
+  title: 'PED Table Soccer',
   routes: [
     {
       path: '/',

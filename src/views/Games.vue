@@ -1,7 +1,7 @@
 <template>
   <div class="games">
-    <b-tabs content-class="mt-3">
-      <b-tab title="Games" active>
+<!--    <b-tabs content-class="mt-3">-->
+<!--      <b-tab title="Games" active>-->
         <b-row class="align-items-center mb-4 pt-3">
           <b-col xs="6">
             <h4 class="mb-0">Game list</h4>
@@ -107,10 +107,10 @@
             </h4>
           </b-col>
         </b-row>
-      </b-tab>
-      <b-tab title="Upcoming games">
-        <upcoming-games />
-      </b-tab>
+<!--      </b-tab>-->
+<!--      <b-tab title="Upcoming games">-->
+<!--        <upcoming-games />-->
+<!--      </b-tab>-->
     </b-tabs>
 
     <!-- Modals -->
