@@ -9,7 +9,7 @@ Vue.use(Vuex);
 const mutationTypes = {
   GET_PLAYERS_START: 'GET_PLAYERS_START',
   GET_PLAYERS_SUCCESS: 'GET_PLAYERS_SUCCESS',
-  GET_GAMES_START: 'GET_PLAYERS_START',
+  GET_GAMES_START: 'GET_GAMES_START',
   GET_GAMES_SUCCESS: 'GET_GAMES_SUCCESS',
   SET_PLAYERS_RANKING: 'SET_PLAYERS_RANKING',
   SET_TEAM_RANKING: 'SET_TEAM_RANKING',
@@ -34,7 +34,7 @@ export default new Vuex.Store({
       return parsePlayerRanking(state.playersRanking, state.playersRef);
     },
     parsedTeamRanking(state) {
-      return parseTeamRanking(state.teamRanking, state.playersRef);
+      return parseTeamRanking(state.teamsRanking, state.playersRef);
     },
   },
   mutations: {
@@ -56,7 +56,7 @@ export default new Vuex.Store({
       state.playersRanking = getPlayersRanking(gamesRef, state.playersRef);
     },
     [mutationTypes.SET_TEAM_RANKING](state, gamesRef) {
-      state.teamRanking = getTeamsRanking(gamesRef, state.playersRef);
+      state.teamsRanking = getTeamsRanking(gamesRef, state.playersRef);
     },
   },
   actions: {

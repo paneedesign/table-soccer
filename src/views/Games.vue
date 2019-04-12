@@ -1,111 +1,117 @@
 <template>
-  <div>
-    <b-row class="align-items-center mb-4 pt-3">
-      <b-col xs="6">
-        <h4 class="mb-0">Game list</h4>
-      </b-col>
-      <b-col xs="6" class="text-right">
-        <b-button v-b-modal.modal-prevent.add-game>Add game</b-button>
-      </b-col>
-    </b-row>
-
-    <b-row>
-      <b-col lg="12">
-        <div v-if="$store.state.gamesRef.length">
-          <b-table
-            id="games-table"
-            responsive
-            striped
-            hover
-            :items="$store.getters.parsedGames"
-            :fields="tableFields"
-            :per-page="perPage"
-            :current-page="currentPage"
-            :sort-by.sync="gamesSortBy"
-            :sort-desc.sync="gamesSortDesc">
-            <template slot="redDefender" slot-scope="data">
-              <div class="d-flex align-items-center"
-                   :class="{'team-won' : data.item.redScore > data.item.blueScore}">
-                <b-img
-                  v-if="data.item.redDefender.pictureUrl"
-                  class="mr-2"
-                  :src="data.item.redDefender.pictureUrl"
-                  rounded="circle"
-                  width="20"
-                  height="20" />
-                <div>
-                  <span>{{ parseFullName(data.item.redDefender) }}</span>
-                </div>
-              </div>
-            </template>
-            <template slot="redStriker" slot-scope="data">
-              <div class="d-flex align-items-center"
-                   :class="{'team-won' : data.item.redScore > data.item.blueScore}">
-                <b-img
-                  v-if="data.item.redStriker.pictureUrl"
-                  class="mr-2"
-                  :src="data.item.redStriker.pictureUrl"
-                  rounded="circle"
-                  width="20"
-                  height="20" />
-                <div>
-                  <span>{{ parseFullName(data.item.redStriker) }}</span>
-                </div>
-              </div>
-            </template>
-            <template slot="blueDefender" slot-scope="data">
-              <div class="d-flex align-items-center"
-                   :class="{'team-won' : data.item.redScore < data.item.blueScore}">
-                <b-img
-                  v-if="data.item.blueDefender.pictureUrl"
-                  class="mr-2"
-                  :src="data.item.blueDefender.pictureUrl"
-                  rounded="circle"
-                  width="20"
-                  height="20" />
-                <div>
-                  <span>{{ parseFullName(data.item.blueDefender) }}</span>
-                </div>
-              </div>
-            </template>
-            <template slot="blueStriker" slot-scope="data">
-              <div class="d-flex align-items-center"
-                   :class="{'team-won' : data.item.redScore < data.item.blueScore}">
-                <b-img
-                  v-if="data.item.blueStriker.pictureUrl"
-                  class="mr-2"
-                  :src="data.item.blueStriker.pictureUrl"
-                  rounded="circle"
-                  width="20"
-                  height="20" />
-                <div>
-                  <span>{{ parseFullName(data.item.blueStriker) }}</span>
-                </div>
-              </div>
-            </template>
-            <template slot="parsedDate" slot-scope="data">
-              {{ data.item.parsedDate.substr(0, 10) }}
-            </template>
-            <template slot="actions" slot-scope="data">
-              <div class="text-center cursor-pointer">
+  <div class="games">
+<!--    <b-tabs content-class="mt-3">-->
+<!--      <b-tab title="Games" active>-->
+        <b-row class="align-items-center mb-4 pt-3">
+          <b-col xs="6">
+            <h4 class="mb-0">Game list</h4>
+          </b-col>
+          <b-col xs="6" class="text-right">
+            <b-button v-b-modal.modal-prevent.add-game>Add game</b-button>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col lg="12">
+            <div v-if="$store.state.gamesRef.length">
+              <b-table
+                id="games-table"
+                responsive
+                striped
+                hover
+                :items="$store.getters.parsedGames"
+                :fields="tableFields"
+                :per-page="perPage"
+                :current-page="currentPage"
+                :sort-by.sync="gamesSortBy"
+                :sort-desc.sync="gamesSortDesc">
+                <template slot="redDefender" slot-scope="data">
+                  <div class="d-flex align-items-center"
+                       :class="{'team-won': redTeamWon(data.item)}">
+                    <b-img
+                      v-if="data.item.redDefender.pictureUrl"
+                      class="mr-2"
+                      :src="data.item.redDefender.pictureUrl"
+                      rounded="circle"
+                      width="20"
+                      height="20" />
+                    <div>
+                      <span>{{ parseFullName(data.item.redDefender) }}</span>
+                    </div>
+                  </div>
+                </template>
+                <template slot="redStriker" slot-scope="data">
+                  <div class="d-flex align-items-center"
+                       :class="{'team-won': redTeamWon(data.item)}">
+                    <b-img
+                      v-if="data.item.redStriker.pictureUrl"
+                      class="mr-2"
+                      :src="data.item.redStriker.pictureUrl"
+                      rounded="circle"
+                      width="20"
+                      height="20" />
+                    <div>
+                      <span>{{ parseFullName(data.item.redStriker) }}</span>
+                    </div>
+                  </div>
+                </template>
+                <template slot="blueDefender" slot-scope="data">
+                  <div class="d-flex align-items-center"
+                       :class="{'team-won': !redTeamWon(data.item)}">
+                    <b-img
+                      v-if="data.item.blueDefender.pictureUrl"
+                      class="mr-2"
+                      :src="data.item.blueDefender.pictureUrl"
+                      rounded="circle"
+                      width="20"
+                      height="20" />
+                    <div>
+                      <span>{{ parseFullName(data.item.blueDefender) }}</span>
+                    </div>
+                  </div>
+                </template>
+                <template slot="blueStriker" slot-scope="data">
+                  <div class="d-flex align-items-center"
+                       :class="{'team-won': !redTeamWon(data.item)}">
+                    <b-img
+                      v-if="data.item.blueStriker.pictureUrl"
+                      class="mr-2"
+                      :src="data.item.blueStriker.pictureUrl"
+                      rounded="circle"
+                      width="20"
+                      height="20" />
+                    <div>
+                      <span>{{ parseFullName(data.item.blueStriker) }}</span>
+                    </div>
+                  </div>
+                </template>
+                <template slot="parsedDate" slot-scope="data">
+                  {{ data.item.parsedDate.substr(0, 10) }}
+                </template>
+                <template slot="actions" slot-scope="data">
+                  <div class="text-center cursor-pointer">
                 <span @click="handleRemoveGame(data.item)"
                       v-if="canRemoveGame(data.item)">🙅🏿‍♂️</span>
-              </div>
-            </template>
-          </b-table>
-          <b-pagination
-            align="center"
-            v-model="currentPage"
-            :total-rows="$store.getters.parsedGames.length"
-            :per-page="perPage"
-            aria-controls="games-table"
-          ></b-pagination>
-        </div>
-        <h4 v-else class="text-center">
-          <b-spinner></b-spinner>
-        </h4>
-      </b-col>
-    </b-row>
+                  </div>
+                </template>
+              </b-table>
+              <b-pagination
+                align="center"
+                v-model="currentPage"
+                :total-rows="$store.getters.parsedGames.length"
+                :per-page="perPage"
+                aria-controls="games-table"
+              ></b-pagination>
+            </div>
+            <h4 v-else class="text-center">
+              <b-spinner></b-spinner>
+            </h4>
+          </b-col>
+        </b-row>
+<!--      </b-tab>-->
+<!--      <b-tab title="Upcoming games">-->
+<!--        <upcoming-games />-->
+<!--      </b-tab>-->
+    </b-tabs>
 
     <!-- Modals -->
     <b-modal
@@ -210,6 +216,7 @@
 import vSelect from 'vue-select';
 import { firestore } from '../firebase';
 import { parseFullName } from '../utils/parse';
+import UpcomingGames from '../components/Games/UpcomingGames.vue';
 
 const gameModel = () => ({
   redTeam: {
@@ -250,6 +257,7 @@ export default {
     };
   },
   components: {
+    UpcomingGames,
     'v-select': vSelect,
   },
   computed: {
@@ -281,6 +289,9 @@ export default {
   methods: {
     parseFullName(item) {
       return parseFullName(item.fullName);
+    },
+    redTeamWon(game) {
+      return parseInt(game.redScore, 10) > parseInt(game.blueScore, 10);
     },
     canRemoveGame(game) {
       const { timestamp } = game;

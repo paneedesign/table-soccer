@@ -1,26 +1,26 @@
+import { getPlayerData } from './players';
+import ROLES from './roles';
+
 const parseFullName = (fullName) => {
   const [name, surname, ...other] = fullName.split(' ');
   return `${name} ${surname.charAt(0).toUpperCase()}. ${other.map(o => `${o.charAt(0).toUpperCase()}.`)}`;
 };
 
-const parseDate = date => `${`${date.getDate() < 10 ? '0' : ''}${date.getDate()}/${`${date.getMonth() < 10 ? '0' : ''}${date.getMonth()}`}`}/${date.getFullYear()} ${date.getHours()}:${`${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}`}`;
+const parseDate = date => `${`${date.getDate() < 10 ? '0' : ''}${date.getDate()}/${`${date.getMonth() < 10 ? '0' : ''}${date.getMonth() + 1}`}`}/${date.getFullYear()} ${date.getHours()}:${`${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}`}`;
 
 const parseGames = (gamesRef, playersRef) => {
   const games = [];
 
   gamesRef.forEach((gameRef) => {
+    const { id } = gameRef;
     const game = gameRef.data();
-    const redDefender = playersRef
-      .find(player => player.id === game.redTeam.defender.id).data();
-    const redStriker = playersRef
-      .find(player => player.id === game.redTeam.striker.id).data();
-    const blueDefender = playersRef
-      .find(player => player.id === game.blueTeam.defender.id).data();
-    const blueStriker = playersRef
-      .find(player => player.id === game.blueTeam.striker.id).data();
+    const redDefender = getPlayerData(game.redTeam.defender.id, playersRef);
+    const redStriker = getPlayerData(game.redTeam.striker.id, playersRef);
+    const blueDefender = getPlayerData(game.blueTeam.defender.id, playersRef);
+    const blueStriker = getPlayerData(game.blueTeam.striker.id, playersRef);
 
     games.push({
-      id: gameRef.id,
+      id,
       redDefender,
       redStriker,
       blueDefender,
@@ -36,35 +36,69 @@ const parseGames = (gamesRef, playersRef) => {
   return games;
 };
 
-const parsePlayerRanking = (rankingObject, playersRef) => Object.keys(rankingObject).map((key) => {
-  const player = playersRef.find(playerRef => playerRef.id === key).data();
+const parsePlayerRanking = (rankingArray, playersRef) => rankingArray.map((ranking) => {
+  const { playerId, ...otherProps } = ranking;
+  const player = getPlayerData(playerId, playersRef);
+
   return {
     player,
-    played: rankingObject[key].played,
-    score: rankingObject[key].rating,
-    won: rankingObject[key].won,
-    lost: rankingObject[key].played - rankingObject[key].won,
-    GF: rankingObject[key].golScored,
-    GS: rankingObject[key].goalSuffered,
+    lost: ranking.played - ranking.won,
+    ...otherProps,
   };
 });
 
-const parseTeamRanking = (rankingObject, playersRef) => Object.keys(rankingObject).map((key) => {
-  let [defender, striker] = key.split('-');
-  defender = playersRef.find(player => player.id === defender).data();
-  striker = playersRef.find(player => player.id === striker).data();
+const parseTeamRanking = (rankingArray, playersRef) => rankingArray.map((ranking) => {
+  const { defenderId, strikerId, ...otherProps } = ranking;
+  const defender = getPlayerData(defenderId, playersRef);
+  const striker = getPlayerData(strikerId, playersRef);
 
   return {
     defender,
     striker,
-    played: rankingObject[key].played,
-    won: rankingObject[key].won,
-    lost: rankingObject[key].played - rankingObject[key].won,
-    GF: rankingObject[key].golScored,
-    GS: rankingObject[key].goalSuffered,
-    score: rankingObject[key].rating,
+    lost: ranking.played - ranking.won,
+    ...otherProps,
   };
 });
+
+const parsePlayerListToGames = (players) => {
+  const teams = [];
+  let j = 0;
+
+  for (let i = 0; i < Math.ceil(players.length * 0.5); i += 1) {
+    const playerOne = players[i + j];
+    const playerTwo = players[i + j + 1];
+    let tmpDefender = playerOne;
+    let tmpStriker = playerTwo;
+
+    if ((playerOne.role !== ROLES.DEFENDER && playerOne.role !== ROLES.ANY)
+      || (playerOne.role === ROLES.ANY && playerTwo.role !== ROLES.STRIKER)) {
+      tmpDefender = playerTwo;
+      tmpStriker = playerOne;
+    }
+
+    teams.push({
+      defender: tmpDefender,
+      striker: tmpStriker,
+    });
+
+    j += 1;
+  }
+
+  const games = [];
+  j = 0;
+
+  for (let i = 0; i < Math.ceil(teams.length * 0.5); i += 1) {
+    games.push({
+      id: i,
+      redTeam: teams[i + j],
+      blueTeam: teams[i + j + 1],
+    });
+
+    j += 1;
+  }
+
+  return games;
+};
 
 export {
   parseDate,
@@ -72,4 +106,5 @@ export {
   parseFullName,
   parsePlayerRanking,
   parseTeamRanking,
+  parsePlayerListToGames,
 };

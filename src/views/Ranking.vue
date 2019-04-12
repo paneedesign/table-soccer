@@ -1,6 +1,5 @@
 <template>
   <div class="ranking">
-
     <b-tabs content-class="mt-3">
       <b-tab title="Player Ranking" active>
         <b-row>
@@ -25,8 +24,9 @@
                     rounded="circle"
                     width="35"
                     height="35" />
-                  <div>
+                  <div class="d-flex flex-column">
                     <span>{{ parseFullName(data.item.player) }}</span>
+                    <small>{{ data.item.player.role }}</small>
                   </div>
                 </div>
               </template>
@@ -98,30 +98,31 @@ export default {
   name: 'Ranking',
   data() {
     return {
-      playerSortBy: 'score',
+      playerSortBy: 'rating',
       playerSortDesc: true,
       playerTableFields: [
         { key: 'position', sortable: false },
         { key: 'player', sortable: false },
-        { key: 'score', sortable: true },
+        { key: 'role', sortable: false },
+        { key: 'rating', label: 'Score', sortable: true },
         { key: 'played', sortable: true },
         { key: 'won', sortable: true },
         { key: 'lost', sortable: true },
-        { key: 'GF', sortable: true },
-        { key: 'GS', sortable: true },
+        { key: 'goalScored', label: 'GF', sortable: true },
+        { key: 'goalSuffered', label: 'GS', sortable: true },
       ],
-      teamSortBy: 'score',
+      teamSortBy: 'rating',
       teamSortDesc: true,
       teamTableFields: [
         { key: 'position', sortable: false },
         { key: 'defender', sortable: false },
         { key: 'striker', sortable: false },
-        { key: 'score', sortable: true },
+        { key: 'rating', label: 'Score', sortable: true },
         { key: 'played', sortable: true },
         { key: 'won', sortable: true },
         { key: 'lost', sortable: true },
-        { key: 'GF', sortable: true },
-        { key: 'GS', sortable: true },
+        { key: 'goalScored', label: 'GF', sortable: true },
+        { key: 'goalSuffered', label: 'GS', sortable: true },
       ],
     };
   },
