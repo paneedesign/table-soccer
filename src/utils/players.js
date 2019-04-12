@@ -1,5 +1,4 @@
-const getPlayerData = (playerId, playersRef) => {
-  return playersRef.find(player => player.id === playerId).data();
-};
+const getPlayerData = (playerId, playersRef) => playersRef
+  .find(player => player.id === playerId).data();
 
 export { getPlayerData };

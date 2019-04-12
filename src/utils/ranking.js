@@ -1,5 +1,4 @@
 import * as Elo from '../lib/elo';
-import { getPlayerData } from './players';
 
 const getPlayersRanking = (gamesRef, playersRef) => {
   let ranking = {};

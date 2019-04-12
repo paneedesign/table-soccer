@@ -1,4 +1,8 @@
-@import "~bootstrap/dist/css/bootstrap";
+$container-max-widths: (
+  xl: 1320px,
+);
+
+@import "~bootstrap/scss/bootstrap";
 @import "~bootstrap-vue/dist/bootstrap-vue";
 
 a {

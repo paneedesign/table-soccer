@@ -26,7 +26,7 @@
                 :sort-desc.sync="gamesSortDesc">
                 <template slot="redDefender" slot-scope="data">
                   <div class="d-flex align-items-center"
-                       :class="{'team-won' : data.item.redScore > data.item.blueScore}">
+                       :class="{'team-won': redTeamWon(data.item)}">
                     <b-img
                       v-if="data.item.redDefender.pictureUrl"
                       class="mr-2"
@@ -41,7 +41,7 @@
                 </template>
                 <template slot="redStriker" slot-scope="data">
                   <div class="d-flex align-items-center"
-                       :class="{'team-won' : data.item.redScore > data.item.blueScore}">
+                       :class="{'team-won': redTeamWon(data.item)}">
                     <b-img
                       v-if="data.item.redStriker.pictureUrl"
                       class="mr-2"
@@ -56,7 +56,7 @@
                 </template>
                 <template slot="blueDefender" slot-scope="data">
                   <div class="d-flex align-items-center"
-                       :class="{'team-won' : data.item.redScore < data.item.blueScore}">
+                       :class="{'team-won': !redTeamWon(data.item)}">
                     <b-img
                       v-if="data.item.blueDefender.pictureUrl"
                       class="mr-2"
@@ -71,7 +71,7 @@
                 </template>
                 <template slot="blueStriker" slot-scope="data">
                   <div class="d-flex align-items-center"
-                       :class="{'team-won' : data.item.redScore < data.item.blueScore}">
+                       :class="{'team-won': !redTeamWon(data.item)}">
                     <b-img
                       v-if="data.item.blueStriker.pictureUrl"
                       class="mr-2"
@@ -109,7 +109,7 @@
         </b-row>
       </b-tab>
       <b-tab title="Upcoming games">
-        Ciao
+        <upcoming-games />
       </b-tab>
     </b-tabs>
 
@@ -216,6 +216,7 @@
 import vSelect from 'vue-select';
 import { firestore } from '../firebase';
 import { parseFullName } from '../utils/parse';
+import UpcomingGames from '../components/Games/UpcomingGames.vue';
 
 const gameModel = () => ({
   redTeam: {
@@ -256,6 +257,7 @@ export default {
     };
   },
   components: {
+    UpcomingGames,
     'v-select': vSelect,
   },
   computed: {
@@ -287,6 +289,9 @@ export default {
   methods: {
     parseFullName(item) {
       return parseFullName(item.fullName);
+    },
+    redTeamWon(game) {
+      return parseInt(game.redScore, 10) > parseInt(game.blueScore, 10);
     },
     canRemoveGame(game) {
       const { timestamp } = game;

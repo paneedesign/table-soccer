@@ -1,11 +1,12 @@
 import { getPlayerData } from './players';
+import ROLES from './roles';
 
 const parseFullName = (fullName) => {
   const [name, surname, ...other] = fullName.split(' ');
   return `${name} ${surname.charAt(0).toUpperCase()}. ${other.map(o => `${o.charAt(0).toUpperCase()}.`)}`;
 };
 
-const parseDate = date => `${`${date.getDate() < 10 ? '0' : ''}${date.getDate()}/${`${date.getMonth() < 10 ? '0' : ''}${date.getMonth()}`}`}/${date.getFullYear()} ${date.getHours()}:${`${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}`}`;
+const parseDate = date => `${`${date.getDate() < 10 ? '0' : ''}${date.getDate()}/${`${date.getMonth() < 10 ? '0' : ''}${date.getMonth() + 1}`}`}/${date.getFullYear()} ${date.getHours()}:${`${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}`}`;
 
 const parseGames = (gamesRef, playersRef) => {
   const games = [];
@@ -59,7 +60,45 @@ const parseTeamRanking = (rankingArray, playersRef) => rankingArray.map((ranking
   };
 });
 
-const parseUpcomingGames = () => {};
+const parsePlayerListToGames = (players) => {
+  const teams = [];
+  let j = 0;
+
+  for (let i = 0; i < Math.ceil(players.length * 0.5); i += 1) {
+    const playerOne = players[i + j];
+    const playerTwo = players[i + j + 1];
+    let tmpDefender = playerOne;
+    let tmpStriker = playerTwo;
+
+    if ((playerOne.role !== ROLES.DEFENDER && playerOne.role !== ROLES.ANY)
+      || (playerOne.role === ROLES.ANY && playerTwo.role !== ROLES.STRIKER)) {
+      tmpDefender = playerTwo;
+      tmpStriker = playerOne;
+    }
+
+    teams.push({
+      defender: tmpDefender,
+      striker: tmpStriker,
+    });
+
+    j += 1;
+  }
+
+  const games = [];
+  j = 0;
+
+  for (let i = 0; i < Math.ceil(teams.length * 0.5); i += 1) {
+    games.push({
+      id: i,
+      redTeam: teams[i + j],
+      blueTeam: teams[i + j + 1],
+    });
+
+    j += 1;
+  }
+
+  return games;
+};
 
 export {
   parseDate,
@@ -67,5 +106,5 @@ export {
   parseFullName,
   parsePlayerRanking,
   parseTeamRanking,
-  parseUpcomingGames,
+  parsePlayerListToGames,
 };

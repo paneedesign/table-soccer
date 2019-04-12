@@ -24,8 +24,9 @@
                     rounded="circle"
                     width="35"
                     height="35" />
-                  <div>
+                  <div class="d-flex flex-column">
                     <span>{{ parseFullName(data.item.player) }}</span>
+                    <small>{{ data.item.player.role }}</small>
                   </div>
                 </div>
               </template>
@@ -102,6 +103,7 @@ export default {
       playerTableFields: [
         { key: 'position', sortable: false },
         { key: 'player', sortable: false },
+        { key: 'role', sortable: false },
         { key: 'rating', label: 'Score', sortable: true },
         { key: 'played', sortable: true },
         { key: 'won', sortable: true },

@@ -1,9 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import { firestore } from './firebase';
-import { parseGames, parsePlayerRanking, parseTeamRanking, parseUpcomingGames } from './utils/parse';
+import { parseGames, parsePlayerRanking, parseTeamRanking } from './utils/parse';
 import { getPlayersRanking, getTeamsRanking } from './utils/ranking';
-import { getUpcomingGames } from './utils/games';
 
 Vue.use(Vuex);
 
@@ -14,7 +13,6 @@ const mutationTypes = {
   GET_GAMES_SUCCESS: 'GET_GAMES_SUCCESS',
   SET_PLAYERS_RANKING: 'SET_PLAYERS_RANKING',
   SET_TEAM_RANKING: 'SET_TEAM_RANKING',
-  SET_UPCOMING_GAMES: 'SET_UPCOMING_GAMES',
 };
 
 export default new Vuex.Store({
@@ -27,7 +25,6 @@ export default new Vuex.Store({
     },
     playersRanking: [],
     teamsRanking: [],
-    upcomingGames: [],
   },
   getters: {
     parsedGames(state) {
@@ -38,9 +35,6 @@ export default new Vuex.Store({
     },
     parsedTeamRanking(state) {
       return parseTeamRanking(state.teamsRanking, state.playersRef);
-    },
-    parsedUpcomingGames(state) {
-      return parseUpcomingGames(state.playersRanking, state.playersRef);
     },
   },
   mutations: {
@@ -63,12 +57,6 @@ export default new Vuex.Store({
     },
     [mutationTypes.SET_TEAM_RANKING](state, gamesRef) {
       state.teamsRanking = getTeamsRanking(gamesRef, state.playersRef);
-    },
-    [mutationTypes.SET_UPCOMING_GAMES](state, gamesRef) {
-      state.upcomingGames = getUpcomingGames(
-        getPlayersRanking(gamesRef, state.playersRef),
-        state.playersRef,
-      );
     },
   },
   actions: {
@@ -101,7 +89,6 @@ export default new Vuex.Store({
           commit(mutationTypes.GET_GAMES_SUCCESS, gamesRef);
           commit(mutationTypes.SET_PLAYERS_RANKING, gamesRef);
           commit(mutationTypes.SET_TEAM_RANKING, gamesRef);
-          commit(mutationTypes.SET_UPCOMING_GAMES, gamesRef);
         });
     },
   },
