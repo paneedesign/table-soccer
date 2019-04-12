@@ -14,7 +14,7 @@
             :value="playerRef.id">{{ parseFullName(playerRef.data()) }}</b-form-checkbox>
         </b-form-checkbox-group>
 
-        <b-button variant="primary" class="mb-3" @change="deselectAll">Deselect All</b-button>
+        <b-button variant="primary" class="mb-3" @click="deselectAll()">Deselect All</b-button>
       </b-col>
       <b-col lg="10">
         <b-row class="align-items-center mb-4 pt-3">
