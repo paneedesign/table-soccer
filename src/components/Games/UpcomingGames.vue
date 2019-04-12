@@ -26,7 +26,6 @@
               <b-dropdown-item @click="generateGames()">By Ranking</b-dropdown-item>
               <b-dropdown-item @click="generateRandomGames()">Random</b-dropdown-item>
             </b-dropdown>
-<!--            <b-button variant="success" @click="generateGames()">Generate</b-button>-->
           </b-col>
         </b-row>
 
