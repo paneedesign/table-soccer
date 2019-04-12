@@ -111,7 +111,7 @@
 <!--      <b-tab title="Upcoming games">-->
 <!--        <upcoming-games />-->
 <!--      </b-tab>-->
-    </b-tabs>
+<!--    </b-tabs>-->
 
     <!-- Modals -->
     <b-modal
