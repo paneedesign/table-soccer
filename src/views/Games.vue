@@ -1,8 +1,8 @@
 <template>
   <div class="games">
-    <b-tabs content-class="mt-3">
+    <b-tabs content-class="mt-3" pills card>
       <b-tab title="Games" active>
-        <b-row class="align-items-center mb-4 pt-3">
+        <b-row class="align-items-center mb-4">
           <b-col xs="6">
             <h4 class="mb-0">Game list</h4>
           </b-col>
@@ -90,7 +90,7 @@
                 <template slot="actions" slot-scope="data">
                   <div class="text-center cursor-pointer">
                 <span @click="handleRemoveGame(data.item)"
-                      v-if="canRemoveGame(data.item)">🙅🏿‍♂️</span>
+                      v-if="canRemoveGame(data.item)">❌️</span>
                   </div>
                 </template>
               </b-table>

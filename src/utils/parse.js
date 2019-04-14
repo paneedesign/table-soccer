@@ -6,7 +6,7 @@ const parseFullName = (fullName) => {
   return `${name} ${surname.charAt(0).toUpperCase()}. ${other.map(o => `${o.charAt(0).toUpperCase()}.`)}`;
 };
 
-const parseDate = date => `${`${date.getDate() < 10 ? '0' : ''}${date.getDate()}/${`${date.getMonth() < 10 ? '0' : ''}${date.getMonth() + 1}`}`}/${date.getFullYear()} ${date.getHours()}:${`${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}`}`;
+const parseDate = (date, time = true) => `${`${date.getDate() < 10 ? '0' : ''}${date.getDate()}/${`${date.getMonth() < 10 ? '0' : ''}${date.getMonth() + 1}`}`}/${date.getFullYear()} ${time ? `${date.getHours()}:${`${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}`}:${date.getSeconds() < 10 ? '0' : ''}${date.getSeconds()}` : ''}`;
 
 const parseGames = (gamesRef, playersRef) => {
   const games = [];
