@@ -147,15 +147,15 @@ export default {
     generateGames() {
       this.upcomingGames = getUpcomingGames(
         getPlayersRanking(this.$store.state.gamesRef, this.$store.state.playersRef),
-        this.$store.state.playersRef,
         this.unavailablePlayers,
+        this.$store.state.playersRef,
       );
     },
     generateRandomGames() {
       this.upcomingGames = getRandomUpcomingGames(
         getPlayersRanking(this.$store.state.gamesRef, this.$store.state.playersRef),
-        this.$store.state.playersRef,
         this.unavailablePlayers,
+        this.$store.state.playersRef,
       );
     },
     redTeamWon(game) {

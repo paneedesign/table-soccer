@@ -22,8 +22,8 @@
                     class="mr-2"
                     :src="data.item.player.pictureUrl"
                     rounded="circle"
-                    width="35"
-                    height="35" />
+                    width="45"
+                    height="45" />
                   <div class="d-flex flex-column">
                     <span>{{ parseFullName(data.item.player) }}</span>
                     <small>{{ data.item.player.role }}</small>
