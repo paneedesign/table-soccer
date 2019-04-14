@@ -1,6 +1,6 @@
 <template>
   <div class="games">
-    <b-tabs content-class="mt-3" pills card>
+    <b-tabs content-class="mt-3">
       <b-tab title="Games" active>
         <b-row class="align-items-center mb-4">
           <b-col xs="6">

@@ -1,6 +1,6 @@
 <template>
   <div class="ranking">
-    <b-tabs content-class="mt-3" pills card>
+    <b-tabs content-class="mt-2">
       <b-tab title="Player Ranking" active>
         <b-row>
           <b-col lg="12">
