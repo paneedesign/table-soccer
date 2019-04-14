@@ -24,7 +24,7 @@
           <b-col xs="6" class="text-right">
             <b-dropdown class="mx-1" right text="Generate">
               <b-dropdown-item @click="generateGames()">By Ranking</b-dropdown-item>
-              <b-dropdown-item @click="generateRandomGames()">Random</b-dropdown-item>
+              <b-dropdown-item @click="generateRandomGames()">Randomly</b-dropdown-item>
             </b-dropdown>
           </b-col>
         </b-row>
@@ -34,11 +34,12 @@
           responsive
           striped
           hover
-          :items="upcomingGames"
-          :fields="tableFields">
+          :items="$store.state.upcomingGames"
+          :fields="tableFields"
+          v-if="$store.state.upcomingGames.length">
           <template slot="redDefender" slot-scope="data">
             <div class="d-flex align-items-center"
-                 :class="{'team-won' : redTeamWon(data.item) && canAddGame(data.item)}">
+                 :class="{'team-won': redTeamWon(data.item) && canAddGame(data.item)}">
               <b-img
                 v-if="data.item.redTeam.defender.pictureUrl"
                 class="mr-2"
@@ -53,7 +54,7 @@
           </template>
           <template slot="redStriker" slot-scope="data">
             <div class="d-flex align-items-center"
-                 :class="{'team-won' : redTeamWon(data.item) && canAddGame(data.item)}">
+                 :class="{'team-won': redTeamWon(data.item) && canAddGame(data.item)}">
               <b-img
                 v-if="data.item.redTeam.striker.pictureUrl"
                 class="mr-2"
@@ -68,7 +69,7 @@
           </template>
           <template slot="blueDefender" slot-scope="data">
             <div class="d-flex align-items-center"
-                 :class="{'team-won' : !redTeamWon(data.item) && canAddGame(data.item)}">
+                 :class="{'team-won': !redTeamWon(data.item) && canAddGame(data.item)}">
               <b-img
                 v-if="data.item.blueTeam.defender.pictureUrl"
                 class="mr-2"
@@ -83,7 +84,7 @@
           </template>
           <template slot="blueStriker" slot-scope="data">
             <div class="d-flex align-items-center"
-                 :class="{'team-won' : !redTeamWon(data.item) && canAddGame(data.item)}">
+                 :class="{'team-won': !redTeamWon(data.item) && canAddGame(data.item)}">
               <b-img
                 v-if="data.item.blueTeam.striker.pictureUrl"
                 class="mr-2"
@@ -106,6 +107,9 @@
             <b-button @click="addGame(data.item)" :disabled="pending">Add</b-button>
           </template>
         </b-table>
+        <div class="text-center" v-else>
+          <span>Generate teams by clicking on the select menu.</span>
+        </div>
       </b-col>
     </b-row>
   </div>
@@ -113,8 +117,6 @@
 
 <script>
 import { firestore } from '../../firebase';
-import { getUpcomingGames, getRandomUpcomingGames } from '../../utils/games';
-import { getPlayersRanking } from '../../utils/ranking';
 import { parseFullName } from '../../utils/parse';
 
 export default {
@@ -122,7 +124,6 @@ export default {
   data() {
     return {
       pending: false,
-      upcomingGames: [],
       unavailablePlayers: [],
       tableFields: [
         'redDefender',
@@ -145,18 +146,10 @@ export default {
       this.unavailablePlayers = [];
     },
     generateGames() {
-      this.upcomingGames = getUpcomingGames(
-        getPlayersRanking(this.$store.state.gamesRef, this.$store.state.playersRef),
-        this.unavailablePlayers,
-        this.$store.state.playersRef,
-      );
+      this.$store.dispatch('getUpcomingGames');
     },
     generateRandomGames() {
-      this.upcomingGames = getRandomUpcomingGames(
-        getPlayersRanking(this.$store.state.gamesRef, this.$store.state.playersRef),
-        this.unavailablePlayers,
-        this.$store.state.playersRef,
-      );
+      this.$store.dispatch('getUpcomingGamesRandomly');
     },
     redTeamWon(game) {
       return parseInt(game.redScore, 10) > parseInt(game.blueScore, 10);
@@ -178,13 +171,13 @@ export default {
 
       const data = {
         redTeam: {
-          defender: firestore.doc(`players/${game.redTeam.defender.value}`),
-          striker: firestore.doc(`players/${game.redTeam.striker.value}`),
+          defender: firestore.doc(`players/${this.$store.getters.getPlayerIdByUid(game.redTeam.defender.uid)}`),
+          striker: firestore.doc(`players/${this.$store.getters.getPlayerIdByUid(game.redTeam.striker.uid)}`),
           score: parseInt(game.redScore, 10),
         },
         blueTeam: {
-          defender: firestore.doc(`players/${game.blueTeam.defender.value}`),
-          striker: firestore.doc(`players/${game.blueTeam.striker.value}`),
+          defender: firestore.doc(`players/${this.$store.getters.getPlayerIdByUid(game.blueTeam.defender.uid)}`),
+          striker: firestore.doc(`players/${this.$store.getters.getPlayerIdByUid(game.blueTeam.striker.uid)}`),
           score: parseInt(game.blueScore, 10),
         },
         timestamp: new Date(),
@@ -196,8 +189,9 @@ export default {
         .add(data)
         .then((docRef) => {
           console.debug('Document written with ID: ', docRef.id);
-          this.upcomingGames.splice(this.upcomingGames.findIndex(games => games.id === game.id), 1);
 
+          // TODO: Do this when create action will be done in the store.
+          this.$store.dispatch('removeUpcomingGame', game);
           this.$nextTick(() => {
             this.$toasted.show('Success: Game inserted', { type: 'success' });
           });
