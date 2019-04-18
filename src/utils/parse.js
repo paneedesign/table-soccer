@@ -27,7 +27,7 @@ const parseGames = (gamesRef, playersRef) => {
       blueStriker,
       redScore: game.redTeam.score,
       blueScore: game.blueTeam.score,
-      location: `🌇 ${game.site}`,
+      site: game.site,
       timestamp: game.timestamp.toDate(),
       parsedDate: parseDate(game.timestamp.toDate()),
     });
@@ -45,7 +45,7 @@ const parsePlayerRanking = (rankingArray, playersRef) => rankingArray.map((ranki
     lost: ranking.played - ranking.won,
     ...otherProps,
   };
-});
+}).filter(rankingPlayer => rankingPlayer.player.enabled);
 
 const parseTeamRanking = (rankingArray, playersRef) => rankingArray.map((ranking) => {
   const { defenderId, strikerId, ...otherProps } = ranking;
@@ -58,7 +58,7 @@ const parseTeamRanking = (rankingArray, playersRef) => rankingArray.map((ranking
     lost: ranking.played - ranking.won,
     ...otherProps,
   };
-});
+}).filter(rankingPlayer => rankingPlayer.defender.enabled && rankingPlayer.striker.enabled);
 
 const parsePlayerListToGames = (players) => {
   const teams = [];

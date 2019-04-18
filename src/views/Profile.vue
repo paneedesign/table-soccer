@@ -15,6 +15,11 @@
       <b-link v-b-modal.modal-prevent.update-role-modal><small>(Update role)</small></b-link>
     </div>
 
+    <div class="mb-3">
+      <span class="mr-2">Site:</span><strong class="mr-2">{{ player.site }}</strong>
+      <b-link v-b-modal.modal-prevent.update-site-modal><small>(Update site)</small></b-link>
+    </div>
+
     <b-modal
       id="update-role-modal"
       @ok="handleUpdateRoleOk"
@@ -27,8 +32,26 @@
           name="role"
           v-validate="'required'"
           v-model="newRole"
-          :options="['Striker','Defender', 'Any']"
+          :options="roleOptions"
           :class="{'is-danger': errors.has('role')}"
+          class="mb-3"></v-select>
+      </form>
+    </b-modal>
+
+    <b-modal
+      id="update-site-modal"
+      @ok="handleUpdateSiteOk"
+      title="Update Site"
+      ref="update-site-modal">
+      <form @submit.stop.prevent="handleUpdateSiteSubmit">
+        <label for="site">Site</label>
+        <v-select
+          id="site"
+          name="site"
+          v-validate="'required'"
+          v-model="newSite"
+          :options="siteOptions"
+          :class="{'is-danger': errors.has('site')}"
           class="mb-3"></v-select>
       </form>
     </b-modal>
@@ -43,6 +66,8 @@
 <script>
 import vSelect from 'vue-select';
 import { firebase, firestore } from '../firebase';
+import SITES from '../utils/sites';
+import ROLES from '../utils/roles';
 
 export default {
   name: 'Profile',
@@ -51,6 +76,7 @@ export default {
       player: null,
       pending: null,
       newRole: null,
+      newSite: null,
     };
   },
   components: {
@@ -64,6 +90,14 @@ export default {
         this.$router.push('games');
       }
     });
+  },
+  computed: {
+    siteOptions() {
+      return Object.keys(SITES).map(site => SITES[site]);
+    },
+    roleOptions() {
+      return Object.keys(ROLES).map(site => ROLES[site]);
+    },
   },
   methods: {
     async handleUpdateRoleOk(event) {
@@ -110,6 +144,56 @@ export default {
         })
         .catch((error) => {
           console.error('Error updating role: ', error);
+          this.$toasted.show(`Error: ${error.message}`, { type: 'error' });
+        })
+        .finally(() => {
+          this.pending = false;
+        });
+    },
+    async handleUpdateSiteOk(event) {
+      event.preventDefault();
+      const valid = await this.$validator.validateAll();
+
+      if (!valid) {
+        this.$toasted.show('Error: Check your data and retry', { type: 'error' });
+        return;
+      }
+
+      this.handleUpdateSiteSubmit();
+    },
+    async handleUpdateSiteSubmit() {
+      if (this.pending) return;
+      this.pending = true;
+
+      const valid = await this.$validator.validateAll();
+      if (!valid) {
+        this.$toasted.show('Error: Check your data and retry', { type: 'error' });
+        this.pending = false;
+        return;
+      }
+
+      const data = {
+        site: this.newSite,
+        lastUpdateOn: new Date(),
+      };
+
+      firestore
+        .collection('players')
+        .doc(this.player.id)
+        .update(data)
+        .then((response) => {
+          console.log('Document successfully updated!', response);
+          this.player.site = this.newSite;
+
+          this.$nextTick(() => {
+            this.$refs['update-site-modal'].hide();
+            this.newSite = null;
+            this.errors.clear();
+            this.$toasted.show('Success: Site updated', { type: 'success' });
+          });
+        })
+        .catch((error) => {
+          console.error('Error updating site: ', error);
           this.$toasted.show(`Error: ${error.message}`, { type: 'error' });
         })
         .finally(() => {

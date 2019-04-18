@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import { firestore } from './firebase';
+import SITES from './utils/sites';
 import { parseGames, parsePlayerRanking, parseTeamRanking } from './utils/parse';
 import { getPlayersRanking, getTeamsRanking } from './utils/ranking';
 import { getRandomUpcomingGames, getUpcomingGames } from './utils/games';
@@ -18,6 +19,7 @@ const mutationTypes = {
   SET_UPCOMING_GAMES: 'SET_UPCOMING_GAMES',
   SET_UPCOMING_GAMES_RANDOMLY: 'SET_UPCOMING_GAMES_RANDOMLY',
   REMOVE_UPCOMING_GAME: 'REMOVE_UPCOMING_GAME',
+  SET_PLAYERS_RANKING_BY_SITE: 'SET_PLAYERS_RANKING_BY_SITE',
 };
 
 export default new Vuex.Store({
@@ -28,14 +30,15 @@ export default new Vuex.Store({
       playersRef: false,
       gamesRef: false,
     },
-    playersRanking: [],
-    teamsRanking: [],
+    playersRanking: {},
+    teamsRanking: {},
     upcomingGames: [],
   },
   getters: {
+    playersRefBySite: state => site => state.playersRef.filter(playerRef => playerRef.data().site === site),
     parsedGames: state => parseGames(state.gamesRef, state.playersRef),
-    parsedPlayerRanking: state => parsePlayerRanking(state.playersRanking, state.playersRef),
-    parsedTeamRanking: state => parseTeamRanking(state.teamsRanking, state.playersRef),
+    parsedPlayerRanking: state => site => parsePlayerRanking(state.playersRanking[site], state.playersRef),
+    parsedTeamRanking: state => site => parseTeamRanking(state.teamsRanking[site], state.playersRef),
     getPlayerIdByUid: state => uid => getPlayerIdByUid(uid, state.playersRef),
   },
   mutations: {
@@ -53,22 +56,24 @@ export default new Vuex.Store({
       state.pending.gamesRef = false;
       state.gamesRef = gamesRef;
     },
-    [mutationTypes.SET_PLAYERS_RANKING](state, gamesRef) {
-      state.playersRanking = getPlayersRanking(gamesRef, state.playersRef);
+    [mutationTypes.SET_PLAYERS_RANKING](state, payload) {
+      const { gamesRef, site } = payload;
+      state.playersRanking[site] = getPlayersRanking(gamesRef, state.playersRef, site);
     },
-    [mutationTypes.SET_TEAM_RANKING](state, gamesRef) {
-      state.teamsRanking = getTeamsRanking(gamesRef, state.playersRef);
+    [mutationTypes.SET_TEAM_RANKING](state, payload) {
+      const { gamesRef, site } = payload;
+      state.teamsRanking[site] = getTeamsRanking(gamesRef, state.playersRef, site);
     },
     [mutationTypes.SET_UPCOMING_GAMES](state, unavailablePlayers) {
       state.upcomingGames = getUpcomingGames(
-        getPlayersRanking(state.gamesRef, state.playersRef),
+        getPlayersRanking(state.gamesRef, state.playersRef, SITES.CATANIA),
         unavailablePlayers,
         state.playersRef,
       );
     },
     [mutationTypes.SET_UPCOMING_GAMES_RANDOMLY](state, unavailablePlayers) {
       state.upcomingGames = getRandomUpcomingGames(
-        getPlayersRanking(state.gamesRef, state.playersRef),
+        getPlayersRanking(state.gamesRef, state.playersRef, SITES.CATANIA),
         unavailablePlayers,
         state.playersRef,
       );
@@ -84,7 +89,6 @@ export default new Vuex.Store({
       commit(mutationTypes.GET_PLAYERS_START);
       return firestore
         .collection('players')
-        .where('enabled', '==', true)
         .orderBy('fullName', 'asc')
         .get()
         .then((querySnapshot) => {
@@ -106,8 +110,18 @@ export default new Vuex.Store({
           const gamesRef = [];
           querySnapshot.forEach(doc => gamesRef.push(doc));
           commit(mutationTypes.GET_GAMES_SUCCESS, gamesRef);
-          commit(mutationTypes.SET_PLAYERS_RANKING, gamesRef);
-          commit(mutationTypes.SET_TEAM_RANKING, gamesRef);
+
+          Object.keys(SITES).forEach((key) => {
+            const site = SITES[key];
+            commit(mutationTypes.SET_PLAYERS_RANKING, {
+              gamesRef,
+              site,
+            });
+            commit(mutationTypes.SET_TEAM_RANKING, {
+              gamesRef,
+              site,
+            });
+          });
         });
     },
     getUpcomingGames({ commit }, unavailablePlayers) {

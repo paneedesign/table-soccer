@@ -1,15 +1,31 @@
 <template>
   <div class="ranking">
+    <b-row class="align-items-center mb-4">
+      <b-col lg="9" md="6">
+        <h3>Ranking</h3>
+      </b-col>
+      <b-col lg="3" md="6">
+        <v-select
+          id="site"
+          name="site"
+          v-model="rankingSite"
+          :options="siteOptions"
+          class="mb-3"
+          readonly></v-select>
+      </b-col>
+    </b-row>
+
     <b-tabs content-class="mt-2">
-      <b-tab title="Player Ranking" active>
+      <b-tab :title="`Player Ranking (${rankingSite})`" active>
         <b-row>
           <b-col lg="12">
             <b-table v-if="$store.state.gamesRef.length"
                      responsive
                      striped
                      hover
+                     borderless
                      :fields="playerTableFields"
-                     :items="$store.getters.parsedPlayerRanking"
+                     :items="$store.getters.parsedPlayerRanking(rankingSite)"
                      :sort-by.sync="playerSortBy"
                      :sort-desc.sync="playerSortDesc">
               <template slot="position" slot-scope="data">
@@ -34,10 +50,13 @@
             <h4 v-else class="text-center">
               <b-spinner></b-spinner>
             </h4>
+            <div v-if="$store.getters.parsedPlayerRanking(rankingSite).length === 0">
+              <p class="text-center">No games, no ranking</p>
+            </div>
           </b-col>
         </b-row>
       </b-tab>
-      <b-tab title="Team Ranking">
+      <b-tab :title="`Team Ranking (${rankingSite})`">
         <b-row>
           <b-col lg="12">
             <b-table
@@ -45,8 +64,9 @@
               responsive
               striped
               hover
+              borderless
               :fields="teamTableFields"
-              :items="$store.getters.parsedTeamRanking"
+              :items="$store.getters.parsedTeamRanking(rankingSite)"
               :sort-by.sync="teamSortBy"
               :sort-desc.sync="teamSortDesc">
               <template slot="position" slot-scope="data">
@@ -92,18 +112,23 @@
 </template>
 
 <script>
+import vSelect from 'vue-select';
 import { parseFullName } from '../utils/parse';
+import SITES from '../utils/sites';
 
 export default {
   name: 'Ranking',
+  components: {
+    'v-select': vSelect,
+  },
   data() {
     return {
+      rankingSite: SITES.CATANIA,
       playerSortBy: 'rating',
       playerSortDesc: true,
       playerTableFields: [
         { key: 'position', sortable: false },
         { key: 'player', sortable: false },
-        { key: 'role', sortable: false },
         { key: 'rating', label: 'Score', sortable: true },
         { key: 'played', sortable: true },
         { key: 'won', sortable: true },
@@ -125,6 +150,11 @@ export default {
         { key: 'goalSuffered', label: 'GS', sortable: true },
       ],
     };
+  },
+  computed: {
+    siteOptions() {
+      return Object.keys(SITES).map(site => SITES[site]);
+    },
   },
   async mounted() {
     this.$store.dispatch('getGames');

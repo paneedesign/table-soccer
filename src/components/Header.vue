@@ -29,6 +29,7 @@
 
 <script>
 import { firebase, firestore } from '../firebase';
+import SITES from '../utils/sites';
 
 export default {
   name: 'Header',
@@ -94,6 +95,7 @@ export default {
         createdAt: new Date(),
         lastUpdateOn: new Date(),
         enabled: false,
+        site: SITES.CATANIA,
       };
 
       return firestore

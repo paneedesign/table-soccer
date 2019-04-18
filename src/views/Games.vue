@@ -1,15 +1,15 @@
 <template>
   <div class="games">
+    <b-row class="align-items-center mb-4">
+      <b-col lg="9" md="6">
+        <h3 class="mb-0">Games</h3>
+      </b-col>
+      <b-col lg="3" md="6" class="text-right">
+        <b-button v-b-modal.modal-prevent.add-game>Add game</b-button>
+      </b-col>
+    </b-row>
     <b-tabs content-class="mt-3">
       <b-tab title="Games" active>
-        <b-row class="align-items-center mb-4">
-          <b-col xs="6">
-            <h4 class="mb-0">Game list</h4>
-          </b-col>
-          <b-col xs="6" class="text-right">
-            <b-button v-b-modal.modal-prevent.add-game>Add game</b-button>
-          </b-col>
-        </b-row>
         <b-row>
           <b-col lg="12">
             <div v-if="$store.state.gamesRef.length">
@@ -18,6 +18,7 @@
                 responsive
                 striped
                 hover
+                borderless
                 :items="$store.getters.parsedGames"
                 :fields="tableFields"
                 :per-page="perPage"
@@ -84,6 +85,12 @@
                     </div>
                   </div>
                 </template>
+                <template slot="site" slot-scope="data">
+                  <span v-if="data.item.site === SITES.CATANIA">🌇</span>
+                  <span v-else-if="data.item.site === SITES.MILAN">🌉</span>
+                  <span v-else-if="data.item.site === SITES.RAGUSA">🌃</span>
+                  <span>{{ data.item.site}}</span>
+                </template>
                 <template slot="parsedDate" slot-scope="data">
                   {{ data.item.parsedDate.substr(0, 10) }}
                 </template>
@@ -108,7 +115,7 @@
           </b-col>
         </b-row>
       </b-tab>
-      <b-tab title="Upcoming games">
+      <b-tab title="Upcoming games (Catania)">
         <upcoming-games />
       </b-tab>
     </b-tabs>
@@ -193,7 +200,7 @@
               name="site"
               v-validate="'required'"
               v-model="newGame.site"
-              :options="['Catania','Milan', 'Ragusa']"
+              :options="siteOptions"
               :class="{'is-danger': errors.has('site')}"
               class="mb-3"
               readonly></v-select>
@@ -214,6 +221,7 @@
 
 <script>
 import vSelect from 'vue-select';
+import SITES from '../utils/sites';
 import { firestore } from '../firebase';
 import { parseFullName } from '../utils/parse';
 import UpcomingGames from '../components/Games/UpcomingGames.vue';
@@ -247,13 +255,14 @@ export default {
         'blueStriker',
         'redScore',
         'blueScore',
-        'location',
+        'site',
         { key: 'parsedDate', label: 'Date', sortable: true },
         'actions',
       ],
       gamesSortBy: 'parsedDate',
       gamesSortDesc: true,
       newGame: { ...gameModel() },
+      SITES,
     };
   },
   components: {
@@ -281,6 +290,9 @@ export default {
           value: playerRef.id,
           label: playerRef.data().fullName,
         }));
+    },
+    siteOptions() {
+      return Object.keys(SITES).map(site => SITES[site]);
     },
   },
   async mounted() {

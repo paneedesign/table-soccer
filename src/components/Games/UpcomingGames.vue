@@ -9,7 +9,7 @@
                                name="unavailable-players">
           <b-form-checkbox
             class="mb-2"
-            v-for="playerRef in $store.state.playersRef"
+            v-for="playerRef in $store.getters.playersRefBySite('Catania')"
             :key="playerRef.id"
             :value="playerRef.id">{{ parseFullName(playerRef.data()) }}</b-form-checkbox>
         </b-form-checkbox-group>
