@@ -146,10 +146,10 @@ export default {
       this.unavailablePlayers = [];
     },
     generateGames() {
-      this.$store.dispatch('getUpcomingGames');
+      this.$store.dispatch('getUpcomingGames', this.unavailablePlayers);
     },
     generateRandomGames() {
-      this.$store.dispatch('getUpcomingGamesRandomly');
+      this.$store.dispatch('getUpcomingGamesRandomly', this.unavailablePlayers);
     },
     redTeamWon(game) {
       return parseInt(game.redScore, 10) > parseInt(game.blueScore, 10);

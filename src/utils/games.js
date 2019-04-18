@@ -8,10 +8,6 @@ function fillPlayerListGaps(playerArrayResult, playerArrayDefault, playersRef) {
     .splice(playerArrayResult.length - (playerArrayResult.length % 4), playerArrayResult.length)
     .map(p => p.playerId);
   while (playerArrayResult.length % 4 !== 0) {
-    // To find random player
-    // const selectedPlayerIndex = playerArrayDefault
-    //   .findIndex(player => !playerIds.includes(player.playerId));
-
     // To find a player with a role different from the last one player role
     const selectedPlayerIndex = playerArrayDefault
       .findIndex(player => !playerIds.includes(player.playerId)
