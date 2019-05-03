@@ -19,7 +19,6 @@ const mutationTypes = {
   SET_UPCOMING_GAMES: 'SET_UPCOMING_GAMES',
   SET_UPCOMING_GAMES_RANDOMLY: 'SET_UPCOMING_GAMES_RANDOMLY',
   REMOVE_UPCOMING_GAME: 'REMOVE_UPCOMING_GAME',
-  SET_PLAYERS_RANKING_BY_SITE: 'SET_PLAYERS_RANKING_BY_SITE',
 };
 
 export default new Vuex.Store({
@@ -35,10 +34,13 @@ export default new Vuex.Store({
     upcomingGames: [],
   },
   getters: {
-    playersRefBySite: state => site => state.playersRef.filter(playerRef => playerRef.data().site === site),
+    playersRefBySite: state => site => state.playersRef
+      .filter(playerRef => playerRef.data().site === site),
     parsedGames: state => parseGames(state.gamesRef, state.playersRef),
-    parsedPlayerRanking: state => site => parsePlayerRanking(state.playersRanking[site], state.playersRef),
-    parsedTeamRanking: state => site => parseTeamRanking(state.teamsRanking[site], state.playersRef),
+    parsedPlayerRanking:
+        state => site => parsePlayerRanking(state.playersRanking[site], state.playersRef),
+    parsedTeamRanking:
+      state => site => parseTeamRanking(state.teamsRanking[site], state.playersRef),
     getPlayerIdByUid: state => uid => getPlayerIdByUid(uid, state.playersRef),
   },
   mutations: {

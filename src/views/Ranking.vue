@@ -15,12 +15,11 @@
       </b-col>
     </b-row>
 
-    <b-tabs content-class="mt-2">
+    <b-tabs content-class="mt-2" v-if="$store.state.gamesRef.length">
       <b-tab :title="`Player Ranking (${rankingSite})`" active>
         <b-row>
           <b-col lg="12">
-            <b-table v-if="$store.state.gamesRef.length"
-                     responsive
+            <b-table responsive
                      striped
                      hover
                      borderless
@@ -47,9 +46,6 @@
                 </div>
               </template>
             </b-table>
-            <h4 v-else class="text-center">
-              <b-spinner></b-spinner>
-            </h4>
             <div v-if="$store.getters.parsedPlayerRanking(rankingSite).length === 0">
               <p class="text-center">No games, no ranking</p>
             </div>
@@ -108,6 +104,9 @@
         </b-row>
       </b-tab>
     </b-tabs>
+    <div class="text-center" v-else>
+      <b-spinner></b-spinner>
+    </div>
   </div>
 </template>
 

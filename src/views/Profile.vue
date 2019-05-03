@@ -96,7 +96,7 @@ export default {
       return Object.keys(SITES).map(site => SITES[site]);
     },
     roleOptions() {
-      return Object.keys(ROLES).map(site => ROLES[site]);
+      return Object.keys(ROLES).map(role => ROLES[role]);
     },
   },
   methods: {
