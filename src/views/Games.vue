@@ -91,7 +91,7 @@
                 <span v-else-if="data.item.site === SITES.RAGUSA">🌃</span>
                 <span>{{ data.item.site}}</span>
               </template>
-              <template slot="parsedDate" slot-scope="data">
+              <template slot="timestamp" slot-scope="data">
                 {{ data.item.parsedDate.substr(0, 10) }}
               </template>
               <template slot="actions" slot-scope="data">
@@ -255,10 +255,10 @@ export default {
         'redScore',
         'blueScore',
         'site',
-        { key: 'parsedDate', label: 'Date', sortable: true },
+        { key: 'timestamp', label: 'Date', sortable: true },
         'actions',
       ],
-      gamesSortBy: 'parsedDate',
+      gamesSortBy: 'timestamp',
       gamesSortDesc: true,
       newGame: { ...gameModel() },
       SITES,
