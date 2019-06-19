@@ -1,6 +1,8 @@
 import { getPlayerData } from './players';
 import ROLES from './roles';
 
+const minPlayedMatch = 15;
+
 const parseFullName = (fullName) => {
   const [name, surname, ...other] = fullName.split(' ');
   return `${name} ${surname.charAt(0).toUpperCase()}. ${other.map(o => `${o.charAt(0).toUpperCase()}.`)}`;
@@ -45,7 +47,7 @@ const parsePlayerRanking = (rankingArray, playersRef) => rankingArray.map((ranki
     lost: ranking.played - ranking.won,
     ...otherProps,
   };
-}).filter(rankingPlayer => rankingPlayer.player.enabled);
+}).filter(rankingPlayer => rankingPlayer.player.enabled && rankingPlayer.played > minPlayedMatch);
 
 const parseTeamRanking = (rankingArray, playersRef) => rankingArray.map((ranking) => {
   const { defenderId, strikerId, ...otherProps } = ranking;
