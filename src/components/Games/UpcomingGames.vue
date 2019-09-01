@@ -14,6 +14,7 @@
             :value="playerRef.id">{{ parseFullName(playerRef.data()) }}</b-form-checkbox>
         </b-form-checkbox-group>
 
+        <b-button variant="primary" class="mb-2 mt-2" @click="selectAll()">Select All</b-button>
         <b-button variant="primary" class="mb-3" @click="deselectAll()">Deselect All</b-button>
       </b-col>
       <b-col lg="10">
@@ -136,11 +137,12 @@ export default {
       ],
     };
   },
-  components: {},
-  computed: {},
   methods: {
     parseFullName(item) {
       return parseFullName(item.fullName);
+    },
+    selectAll() {
+      this.unavailablePlayers = this.$store.getters.playersRefBySite('Catania').map(player => player.id);
     },
     deselectAll() {
       this.unavailablePlayers = [];

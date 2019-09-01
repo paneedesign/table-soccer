@@ -24,7 +24,8 @@
       id="update-role-modal"
       @ok="handleUpdateRoleOk"
       title="Update Role"
-      ref="update-role-modal">
+      ref="update-role-modal"
+      data-vv-scope="role">
       <form @submit.stop.prevent="handleUpdateRoleSubmit">
         <label for="role">Role</label>
         <v-select
@@ -42,7 +43,8 @@
       id="update-site-modal"
       @ok="handleUpdateSiteOk"
       title="Update Site"
-      ref="update-site-modal">
+      ref="update-site-modal"
+      data-vv-scope="site">
       <form @submit.stop.prevent="handleUpdateSiteSubmit">
         <label for="site">Site</label>
         <v-select
@@ -86,6 +88,8 @@ export default {
     firebase.auth().onAuthStateChanged(async (user) => {
       if (user) {
         this.player = await this.getPlayer(user);
+        this.newRole = this.player.role;
+        this.newSite = this.player.site;
       } else {
         this.$router.push('games');
       }
@@ -102,8 +106,8 @@ export default {
   methods: {
     async handleUpdateRoleOk(event) {
       event.preventDefault();
-      const valid = await this.$validator.validateAll();
 
+      const valid = await this.$validator.validateAll('role');
       if (!valid) {
         this.$toasted.show('Error: Check your data and retry', { type: 'error' });
         return;
@@ -115,7 +119,7 @@ export default {
       if (this.pending) return;
       this.pending = true;
 
-      const valid = await this.$validator.validateAll();
+      const valid = await this.$validator.validateAll('site');
       if (!valid) {
         this.$toasted.show('Error: Check your data and retry', { type: 'error' });
         this.pending = false;
@@ -132,12 +136,11 @@ export default {
         .doc(this.player.id)
         .update(data)
         .then((response) => {
-          console.log('Document successfully updated!', response);
+          console.debug('Document successfully updated!', response);
           this.player.role = this.newRole;
 
           this.$nextTick(() => {
             this.$refs['update-role-modal'].hide();
-            this.newRole = null;
             this.errors.clear();
             this.$toasted.show('Success: Role updated', { type: 'success' });
           });
@@ -182,12 +185,11 @@ export default {
         .doc(this.player.id)
         .update(data)
         .then((response) => {
-          console.log('Document successfully updated!', response);
+          console.debug('Document successfully updated!', response);
           this.player.site = this.newSite;
 
           this.$nextTick(() => {
             this.$refs['update-site-modal'].hide();
-            this.newSite = null;
             this.errors.clear();
             this.$toasted.show('Success: Site updated', { type: 'success' });
           });
@@ -224,7 +226,7 @@ export default {
         this.player = null;
         this.$router.go();
         this.$toasted.show('Success: Signed out successfully', { type: 'success' });
-        console.log('Sign out successfully');
+        console.debug('Sign out successfully');
       }).catch((error) => {
         this.$toasted.show(`Error: ${error.message}`, { type: 'error' });
         console.error(error);

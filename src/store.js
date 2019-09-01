@@ -67,17 +67,29 @@ export default new Vuex.Store({
       state.teamsRanking[site] = getTeamsRanking(gamesRef, state.playersRef, site);
     },
     [mutationTypes.SET_UPCOMING_GAMES](state, unavailablePlayers) {
+      const playersRef = state.playersRef
+        .filter(playerRef => playerRef.data().site === SITES.CATANIA);
+      const playersRanking = getPlayersRanking(state.gamesRef, state.playersRef, SITES.CATANIA)
+        .filter(playerRanking => playersRef
+          .find(playerRef => playerRef.id === playerRanking.playerId));
+
       state.upcomingGames = getUpcomingGames(
-        getPlayersRanking(state.gamesRef, state.playersRef, SITES.CATANIA),
+        playersRanking,
         unavailablePlayers,
-        state.playersRef,
+        playersRef,
       );
     },
     [mutationTypes.SET_UPCOMING_GAMES_RANDOMLY](state, unavailablePlayers) {
+      const playersRef = state.playersRef
+        .filter(playerRef => playerRef.data().site === SITES.CATANIA);
+      const playersRanking = getPlayersRanking(state.gamesRef, state.playersRef, SITES.CATANIA)
+        .filter(playerRanking => playersRef
+          .find(playerRef => playerRef.id === playerRanking.playerId));
+
       state.upcomingGames = getRandomUpcomingGames(
-        getPlayersRanking(state.gamesRef, state.playersRef, SITES.CATANIA),
+        playersRanking,
         unavailablePlayers,
-        state.playersRef,
+        playersRef,
       );
     },
     [mutationTypes.REMOVE_UPCOMING_GAME](state, upcomingGameIndex) {

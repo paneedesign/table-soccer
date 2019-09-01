@@ -294,7 +294,7 @@ export default {
       return Object.keys(SITES).map(site => SITES[site]);
     },
   },
-  async mounted() {
+  mounted() {
     this.$store.dispatch('getGames');
   },
   methods: {
