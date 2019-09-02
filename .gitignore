@@ -7,8 +7,6 @@ backups/
 .env.local
 .env.*.local
 
-backups/
-
 # Editor directories and files
 .idea
 .vscode
