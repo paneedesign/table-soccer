@@ -4,6 +4,7 @@
 
         <b-navbar-brand to="/">
           <img src="../assets/logo.svg">
+          <span class="env" v-if="isDev">DEV</span>
         </b-navbar-brand>
 
         <b-collapse is-nav id="nav_collapse">
@@ -46,6 +47,11 @@ export default {
         this.player = await this.getPlayer(user);
       }
     });
+  },
+  computed: {
+    isDev() {
+      return process.env.NODE_ENV === 'development';
+    },
   },
   methods: {
     signInWithGoogle() {
@@ -115,3 +121,13 @@ export default {
   },
 };
 </script>
+
+<style>
+  .env {
+    position: relative;
+    top: 8px;
+    font-size: 8px;
+    font-weight: bold;
+    color: red;
+  }
+</style>
