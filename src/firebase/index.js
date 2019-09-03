@@ -3,9 +3,9 @@ import 'firebase/auth';
 import 'firebase/firestore';
 
 const config = {
-  apiKey: 'AIzaSyDakdubwr2GBDVIx2XdTMZCNGoEFxNc3PM',
-  projectId: 'ped-table-soccer',
-  authDomain: 'ped-table-soccer.firebaseapp.com',
+  apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
+  projectId: process.env.VUE_APP_FIREBASE_PROJECT_ID,
+  authDomain: process.env.VUE_APP_FIREBASE_AUTH_DOMAIN,
 };
 
 const firebaseApp = firebase.initializeApp(config);

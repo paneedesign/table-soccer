@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "deploy": "sh scripts/deploy.sh"
+    "serve:dev": "vue-cli-service --mode development serve",
+    "serve:prod": "vue-cli-service --mode production serve",
+    "build:dev": "vue-cli-service --mode development build",
+    "build:prod": "vue-cli-service --mode production build",
+    "deploy:dev": "sh scripts/deploy.sh development",
+    "deploy:prod": "sh scripts/deploy.sh production",
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
     "bootstrap-vue": "^2.0.0-rc.16",

@@ -1,6 +1,6 @@
 {
   "projects": {
-    "default": "ped-table-soccer",
-    "dev": "ped-table-soccer-dev"
+    "production": "ped-table-soccer",
+    "development": "ped-table-soccer-dev"
   }
 }
