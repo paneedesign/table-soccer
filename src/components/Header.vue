@@ -124,8 +124,8 @@ export default {
 
 <style>
   .env {
-    position: relative;
-    top: 8px;
+    position: absolute;
+    bottom: 8px;
     font-size: 8px;
     font-weight: bold;
     color: red;
