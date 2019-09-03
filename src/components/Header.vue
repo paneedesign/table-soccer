@@ -2,7 +2,10 @@
     <b-navbar toggleable="md" variant="light" fixed="top" :sticky="true">
         <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
-        <b-navbar-brand to="/">Table Soccer</b-navbar-brand>
+        <b-navbar-brand to="/">
+          <img src="../assets/logo.svg">
+          <span class="env" v-if="isDev">DEV</span>
+        </b-navbar-brand>
 
         <b-collapse is-nav id="nav_collapse">
             <b-navbar-nav>
@@ -44,6 +47,11 @@ export default {
         this.player = await this.getPlayer(user);
       }
     });
+  },
+  computed: {
+    isDev() {
+      return process.env.NODE_ENV === 'development';
+    },
   },
   methods: {
     signInWithGoogle() {
@@ -113,3 +121,13 @@ export default {
   },
 };
 </script>
+
+<style>
+  .env {
+    position: absolute;
+    bottom: 8px;
+    font-size: 8px;
+    font-weight: bold;
+    color: red;
+  }
+</style>

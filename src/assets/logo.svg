@@ -1,0 +1,25 @@
+<svg width="115.99999999999999" height="30.000000000000004" xmlns="http://www.w3.org/2000/svg">
+ <defs>
+  <clipPath id="clip0">
+   <rect id="svg_1" fill="white" height="25" width="58"/>
+  </clipPath>
+  <linearGradient y2="0" x2="1" y1="0" x1="0" id="svg_17">
+   <stop offset="0" stop-opacity="0.996094" stop-color="#1031ed"/>
+   <stop offset="1" stop-opacity="0.996094" stop-color="#6510ed"/>
+  </linearGradient>
+ </defs>
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="32" width="118" y="-1" x="-1"/>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <g id="svg_2" clip-path="url(#clip0)">
+   <path id="svg_3" fill="#1E1E1E" d="m14.6144,3.33372c-0.6006,-1.04424 -1.4654,-1.9046 -2.5037,-2.49101c-1.0383,-0.58642 -2.2121,-0.87735 -3.39845,-0.84232l-3.81084,0l0,5l3.81084,0c1.90745,0 1.90745,1.66666 1.90745,1.66666l0,1.66667c0,0 0,1.66668 -1.90745,1.66668l-3.81084,0l0,-5.00001l-4.90141,0l0,20.00001l4.90141,0l0,-10l3.81084,0c1.18434,0.0371 2.35675,-0.2507 3.39485,-0.8333c1.0382,-0.5827 1.904,-1.4388 2.5073,-2.4792c0.579,-1.0203 0.8912,-2.17533 0.9067,-3.35418l0,-1.66667c-0.019,-1.17176 -0.3311,-2.31915 -0.9067,-3.33333z"/>
+   <path id="svg_4" fill="#1E1E1E" d="m44.6556,5c1.9075,0 1.9075,3 1.9075,3l0,9c0,0 0,3 -1.9075,3l-3.8108,0l0,-15l3.8108,0zm0,-5l-8.7122,0l0,25l8.7122,0c2.9327,0 5.3589,-1.9 6.331,-4.9583c0.307,-0.984 0.468,-2.0092 0.4779,-3.0417l0,-9c-0.0099,-1.03251 -0.1709,-2.05773 -0.4779,-3.04167c-0.9721,-3.05833 -3.3983,-4.95833 -6.331,-4.95833z"/>
+   <path id="svg_5" fill="#1E1E1E" d="m17.9717,25l14.7042,0l0,-5l-9.8028,0l0,-5l7.3521,0l0,-5l-7.3521,0l0,-5l9.8028,0l0,-5l-14.7042,0l0,25z"/>
+   <path id="svg_6" fill="#1E1E1E" d="m58,20l-4.9014,0l0,5l4.9014,0l0,-5z"/>
+  </g>
+  <text font-weight="bold" xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="17" id="svg_13" y="24.022758" x="61.379749" stroke-opacity="null" stroke-width="0" stroke="null" fill="url(#svg_17)">soccer</text>
+ </g>
+</svg>
