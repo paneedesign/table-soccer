@@ -1,3 +1,2 @@
 #!/usr/bin/env bash
-firebase deploy --only functions
-
+firebase deploy -P $1 --only functions

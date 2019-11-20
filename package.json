@@ -9,6 +9,8 @@
     "build:prod": "vue-cli-service --mode production build",
     "deploy:dev": "sh scripts/deploy.sh development",
     "deploy:prod": "sh scripts/deploy.sh production",
+    "deploy:function:dev": "sh scripts/deploy-functions.sh development",
+    "deploy:function:prod": "sh scripts/deploy-functions.sh production",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
