@@ -1,30 +1,32 @@
-import SITES from "../utils/sites";
-import fetchGames from "./games";
-import { getPlayersRanking, getTeamsRanking } from "../utils/ranking";
+import SITES from '../utils/sites';
+import fetchGames from './games';
+import { getPlayersRanking, getTeamsRanking } from '../utils/ranking';
+import * as admin from 'firebase-admin';
+import {DocumentSnapshot} from 'firebase-functions/lib/providers/firestore';
 
-export const fetchPlayerRankings = (firestore: any) => {
+export const fetchPlayerRankings = (firestore: admin.firestore.Firestore) => {
   return firestore
     .collection('playersRanking')
     .get()
-    .then((querySnapshot: any) => {
-      const rankingsRef: any[] = [];
-      querySnapshot.forEach((doc: any) => rankingsRef.push(doc));
+    .then(querySnapshot => {
+      const rankingsRef: DocumentSnapshot[] = [];
+      querySnapshot.forEach((doc: DocumentSnapshot) => rankingsRef.push(doc));
       return rankingsRef;
     });
 };
 
-export const fetchTeamsRankings = (firestore: any) => {
+export const fetchTeamsRankings = (firestore: admin.firestore.Firestore) => {
   return firestore
     .collection('teamsRanking')
     .get()
-    .then((querySnapshot: any) => {
-      const rankingsRef: any[] = [];
-      querySnapshot.forEach((doc: any) => rankingsRef.push(doc));
+    .then(querySnapshot => {
+      const rankingsRef: DocumentSnapshot[] = [];
+      querySnapshot.forEach((doc: DocumentSnapshot) => rankingsRef.push(doc));
       return rankingsRef;
     });
 };
 
-export const setRankings = async (firestore, sites: Array<SITES>) => {
+export const setRankings = async (firestore: admin.firestore.Firestore, sites: Array<SITES>) => {
   const gamesRef = await fetchGames(firestore);
 
   const playersRankingBatch = firestore.batch();

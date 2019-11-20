@@ -1,13 +1,11 @@
 // The Cloud Functions for Firebase SDK to create Cloud Functions and setup triggers.
-import {Change, EventContext} from "firebase-functions";
-import {DocumentSnapshot} from "firebase-functions/lib/providers/firestore";
-import {fetchPlayerRankings, fetchTeamsRankings, setRankings} from "./firestore/ranking";
-import {updatePlayersRanking, updateTeamsRanking} from "./utils/ranking";
-
-import SITES from "./utils/sites";
-
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
+import * as functions from 'firebase-functions';
+import * as admin from 'firebase-admin';
+import {DocumentSnapshot} from 'firebase-functions/lib/providers/firestore';
+import {fetchPlayerRankings, fetchTeamsRankings, setRankings} from './firestore/ranking';
+import {updatePlayersRanking, updateTeamsRanking} from './utils/ranking';
+import SITES from './utils/sites';
+import {IGame, IRanking} from './utils/interfaces';
 
 admin.initializeApp();
 
@@ -19,24 +17,29 @@ const db = admin.firestore();
  */
 exports.updateRanking = functions.firestore
   .document('games/{game}')
-  .onWrite(async (change: Change<DocumentSnapshot>, context: EventContext) => {
-    const newGame = change.after.exists ? change.after.data() : null;
-    const oldGame = change.before.data();
+  .onWrite(async (change: functions.Change<DocumentSnapshot>) => {
+    const newGame = change.after.exists ? (change.after.data() as IGame) : null;
+    const oldGame = change.before.data() as IGame;
 
-    const playerRankingsRef = await fetchPlayerRankings(db);
-    const teamsRankingsRef = await fetchTeamsRankings(db);
+    const playerRankingsRef: DocumentSnapshot[] = await fetchPlayerRankings(db);
+    const teamsRankingsRef: DocumentSnapshot[] = await fetchTeamsRankings(db);
 
     if (newGame) {
       const { site } = newGame;
       const playersRankingRef = playerRankingsRef.find(rankRef => rankRef.id === site);
       const teamsRankingRef = teamsRankingsRef.find(rankRef => rankRef.id === site);
 
-      db.collection('playersRanking')
-        .doc(site)
-        .set(updatePlayersRanking(playersRankingRef.data(), newGame));
-      db.collection('teamsRanking')
-        .doc(site)
-        .set(updateTeamsRanking(teamsRankingRef.data(), newGame));
+      if (playerRankingsRef) {
+        await db.collection('playersRanking')
+          .doc(site)
+          .set(updatePlayersRanking((playersRankingRef!.data() as IRanking), newGame));
+      }
+
+      if (teamsRankingRef) {
+        await db.collection('teamsRanking')
+          .doc(site)
+          .set(updateTeamsRanking((teamsRankingRef!.data() as IRanking), newGame));
+      }
     } else if (oldGame && newGame === null) {
       const { site } = oldGame;
       await setRankings(db, [site]);

@@ -1,11 +1,14 @@
-const fetchGames = (firestore: any) => {
+import * as admin from 'firebase-admin';
+import {DocumentSnapshot} from 'firebase-functions/lib/providers/firestore';
+
+const fetchGames = (firestore: admin.firestore.Firestore) => {
   return firestore
     .collection('games')
     .orderBy('timestamp', 'asc')
     .get()
-    .then((querySnapshot: any) => {
-      const gamesRef: any[] = [];
-      querySnapshot.forEach((doc: any) => gamesRef.push(doc));
+    .then(querySnapshot => {
+      const gamesRef: DocumentSnapshot[] = [];
+      querySnapshot.forEach(doc => gamesRef.push(doc));
       return gamesRef;
     });
 };

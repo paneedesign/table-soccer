@@ -1,13 +1,7 @@
 import { GAME_RESULTS, getNewRating } from '../libs/elo';
 import SITES from './sites';
-
-interface IRankingObject {
-  won: number,
-  played: number,
-  goalScored: number,
-  goalSuffered: number,
-  rating: number,
-}
+import {DocumentSnapshot} from 'firebase-functions/lib/providers/firestore';
+import {IGame, IRanking, IRankingObject} from './interfaces';
 
 const defaultRankingObject: IRankingObject = {
   won: 0,
@@ -17,7 +11,7 @@ const defaultRankingObject: IRankingObject = {
   rating: 1000,
 };
 
-const updatePlayerRankingWithNewGame = (ranking, game) => {
+const updatePlayerRankingWithNewGame = (ranking: IRanking, game: IGame) => {
   const redTeamRating = ranking[game.redTeam.defender.id].rating + ranking[game.redTeam.striker.id].rating;
   const blueTeamRating = ranking[game.blueTeam.defender.id].rating + ranking[game.blueTeam.striker.id].rating;
 
@@ -60,7 +54,7 @@ const updatePlayerRankingWithNewGame = (ranking, game) => {
   return ranking;
 };
 
-const updateTeamRankingWithNewGame = (ranking, game) => {
+const updateTeamRankingWithNewGame = (ranking: IRanking, game: IGame) => {
   const redTeam = `${game.redTeam.defender.id}-${game.redTeam.striker.id}`;
   const blueTeam = `${game.blueTeam.defender.id}-${game.blueTeam.striker.id}`;
 
@@ -96,13 +90,13 @@ const updateTeamRankingWithNewGame = (ranking, game) => {
   return ranking;
 };
 
-export const getPlayersRanking = (gamesRef, site: SITES) => {
-  let ranking: {[k: string]: IRankingObject} = {};
+export const getPlayersRanking = (gamesRef: DocumentSnapshot[], site: SITES) => {
+  let ranking: IRanking = {};
 
   gamesRef
-    .filter((game: any) => game.data().site === site)
-    .forEach((gameRef: any) => {
-      const game = gameRef.data();
+    .filter(gameRef => (gameRef.data() as IGame).site === site)
+    .forEach((gameRef: DocumentSnapshot) => {
+      const game = gameRef.data() as IGame;
 
       const baseRanking = {
         [game.redTeam.defender.id]: {
@@ -127,13 +121,13 @@ export const getPlayersRanking = (gamesRef, site: SITES) => {
   return ranking;
 };
 
-export const getTeamsRanking = (gamesRef, site: SITES) => {
-  let ranking: {[k: string]: IRankingObject} = {};
+export const getTeamsRanking = (gamesRef: DocumentSnapshot[], site: SITES) => {
+  let ranking: IRanking = {};
 
   gamesRef
-    .filter((game: any) => game.data().site === site)
-    .forEach((gameRef: any) => {
-      const game = gameRef.data();
+    .filter(gameRef => (gameRef.data() as IGame).site === site)
+    .forEach((gameRef: DocumentSnapshot) => {
+      const game = gameRef.data() as IGame;
       const redTeam = `${game.redTeam.defender.id}-${game.redTeam.striker.id}`;
       const blueTeam = `${game.blueTeam.defender.id}-${game.blueTeam.striker.id}`;
 
@@ -154,10 +148,10 @@ export const getTeamsRanking = (gamesRef, site: SITES) => {
   return ranking;
 };
 
-export const updatePlayersRanking = (ranking: {[k: string]: IRankingObject}, game) => {
+export const updatePlayersRanking = (ranking: IRanking, game: IGame) => {
   return updatePlayerRankingWithNewGame(ranking, game);
 };
 
-export const updateTeamsRanking = (ranking: {[k: string]: IRankingObject}, game) => {
+export const updateTeamsRanking = (ranking: IRanking, game: IGame) => {
   return updateTeamRankingWithNewGame(ranking, game);
 };
