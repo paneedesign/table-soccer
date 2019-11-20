@@ -1,6 +1,6 @@
-# table-soccer
+# Table Soccer
 
-## Project setup
+## Project (hosting) setup
 ```
 npm install
 ```
@@ -8,6 +8,11 @@ npm install
 ### Compiles and hot-reloads for development
 ```
 npm run serve
+```
+
+### Compiles and serve a production build
+```
+npm run serve:prod
 ```
 
 ### Compiles and minifies for production
@@ -20,9 +25,30 @@ npm run build
 npm run lint
 ```
 
-### Deploy
+### Deploy hosting in development app
 ```
-npm run deploy
+make deploy_dev
+```
+
+### Deploy hosting in production app
+```
+make deploy_prod
+```
+
+## Project (functions) setup
+```
+cd functions/
+npm install
+```
+
+### Deploy functions in development app
+```
+make deploy_functions_dev
+```
+
+### Deploy functions in production app
+```
+make deploy_functions_prod
 ```
 
 ### Customize configuration
