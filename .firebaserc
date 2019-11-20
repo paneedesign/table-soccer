@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "production": "ped-table-soccer",
+    "development": "ped-table-soccer-dev"
+  }
+}

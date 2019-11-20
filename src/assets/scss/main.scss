@@ -1,0 +1,16 @@
+$container-max-widths: (
+  xl: 1320px,
+);
+
+@import "~bootstrap/scss/bootstrap";
+@import "~bootstrap-vue/dist/bootstrap-vue";
+
+a {
+  color: rgba(0, 0, 0, .5);
+  text-decoration: none;
+
+  &:hover {
+    color: rgba(0, 0, 0, .7);
+    text-decoration: none;
+  }
+}

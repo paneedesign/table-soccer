@@ -1,0 +1,51 @@
+{
+  "name": "table-soccer",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve:dev": "vue-cli-service --mode development serve",
+    "serve:prod": "vue-cli-service --mode production serve",
+    "build:dev": "vue-cli-service --mode development build",
+    "build:prod": "vue-cli-service --mode production build",
+    "deploy:dev": "sh scripts/deploy.sh development",
+    "deploy:prod": "sh scripts/deploy.sh production",
+    "deploy:function:dev": "sh scripts/deploy-functions.sh development",
+    "deploy:function:prod": "sh scripts/deploy-functions.sh production",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "bootstrap-vue": "^2.0.0-rc.16",
+    "core-js": "^2.6.5",
+    "firebase": "^5.9.2",
+    "register-service-worker": "^1.6.2",
+    "vee-validate": "^2.2.0",
+    "vue": "^2.6.6",
+    "vue-router": "^3.0.1",
+    "vue-select": "^2.6.4",
+    "vue-toasted": "^1.1.26",
+    "vuex": "^3.0.1"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.5.0",
+    "@vue/cli-plugin-eslint": "^3.5.0",
+    "@vue/cli-plugin-pwa": "^3.5.0",
+    "@vue/cli-service": "^3.5.0",
+    "@vue/eslint-config-airbnb": "^4.0.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.8.0",
+    "eslint-plugin-vue": "^5.0.0",
+    "lint-staged": "^8.1.4",
+    "node-sass": "^4.11.0",
+    "sass-loader": "^7.1.0",
+    "vue-template-compiler": "^2.5.21"
+  },
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,vue}": [
+      "vue-cli-service lint",
+      "git add"
+    ]
+  }
+}
