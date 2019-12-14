@@ -121,12 +121,11 @@ export default new Vuex.Store({
       firestore
         .collection('playersRanking')
         .doc(site)
-        .get()
-        .then((doc) => {
-          if (doc.exists) {
+        .onSnapshot((querySnapshot) => {
+          if (querySnapshot.exists) {
             commit(mutationTypes.GET_PLAYERS_RANKING_SUCCESS, {
               site,
-              data: doc.data(),
+              data: querySnapshot.data(),
             });
           }
         });
@@ -137,12 +136,11 @@ export default new Vuex.Store({
       firestore
         .collection('teamsRanking')
         .doc(site)
-        .get()
-        .then((doc) => {
-          if (doc.exists) {
+        .onSnapshot((querySnapshot) => {
+          if (querySnapshot.exists) {
             commit(mutationTypes.GET_TEAM_RANKING_SUCCESS, {
               site,
-              data: doc.data(),
+              data: querySnapshot.data(),
             });
           }
         });
