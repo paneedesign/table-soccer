@@ -151,13 +151,10 @@ export default new Vuex.Store({
 
       commit(mutationTypes.GET_GAMES_START);
 
-      const gamesRef = firestore.collection('games');
-
-      gamesRef
+      firestore.collection('games')
         .orderBy('timestamp', 'desc')
         .limit(20)
-        .get()
-        .then((querySnapshot) => {
+        .onSnapshot((querySnapshot) => {
           const data = [];
 
           querySnapshot.forEach(doc => data.push({
@@ -177,9 +174,7 @@ export default new Vuex.Store({
       if (state.games.pending) return;
       commit(mutationTypes.GET_MORE_GAMES_START);
 
-      const gamesRef = firestore.collection('games');
-
-      gamesRef
+      firestore.collection('games')
         .orderBy('timestamp', 'desc')
         .startAfter(state.games.pagination.next)
         .limit(20)
