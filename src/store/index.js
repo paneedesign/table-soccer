@@ -73,14 +73,6 @@ export default new Vuex.Store({
       state.pending.teamsRanking = false;
       Vue.set(state.teamsRanking, site, data);
     },
-    // [mutationTypes.SET_PLAYERS_RANKING](state, payload) {
-    //   const { gamesRef, site } = payload;
-    //   state.playersRanking[site] = getPlayersRanking(gamesRef, state.playersRef, site);
-    // },
-    // [mutationTypes.SET_TEAM_RANKING](state, payload) {
-    //   const { gamesRef, site } = payload;
-    //   state.teamsRanking[site] = getTeamsRanking(gamesRef, state.playersRef, site);
-    // },
   },
   actions: {
     getPlayers({ state, commit }) {
