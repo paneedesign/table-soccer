@@ -8,23 +8,23 @@
         <v-select
           id="site"
           name="site"
-          v-model="rankingSite"
-          :options="siteOptions"
+          v-model="site"
           class="mb-3"
+          :options="siteOptions"
+          @change="siteChange"
           readonly></v-select>
       </b-col>
     </b-row>
-
-    <b-tabs content-class="mt-2" v-if="$store.state.gamesRef.length">
-      <b-tab :title="`Player Ranking (${rankingSite})`" active>
+    <b-tabs content-class="mt-2">
+      <b-tab :title="`Player Ranking (${site})`" active>
         <b-row>
-          <b-col lg="12">
+          <b-col lg="12" v-if="$store.state.playersRanking[site]">
             <b-table responsive
                      striped
                      hover
                      borderless
                      :fields="playerTableFields"
-                     :items="$store.getters.parsedPlayerRanking(rankingSite)"
+                     :items="$store.getters.parsedPlayerRanking(site)"
                      :sort-by.sync="playerSortBy"
                      :sort-desc.sync="playerSortDesc">
               <template slot="position" slot-scope="data">
@@ -46,23 +46,25 @@
                 </div>
               </template>
             </b-table>
-            <div v-if="$store.getters.parsedPlayerRanking(rankingSite).length === 0">
+            <div v-if="$store.getters.parsedPlayerRanking(site).length === 0">
               <p class="text-center">No games, no ranking</p>
             </div>
           </b-col>
+          <div class="w-100 text-center" v-else>
+            <b-spinner></b-spinner>
+          </div>
         </b-row>
       </b-tab>
-      <b-tab :title="`Team Ranking (${rankingSite})`">
+      <b-tab :title="`Team Ranking (${site})`">
         <b-row>
-          <b-col lg="12">
+          <b-col lg="12" v-if="$store.state.teamsRanking[site]">
             <b-table
-              v-if="$store.state.gamesRef.length"
               responsive
               striped
               hover
               borderless
               :fields="teamTableFields"
-              :items="$store.getters.parsedTeamRanking(rankingSite)"
+              :items="$store.getters.parsedTeamRanking(site)"
               :sort-by.sync="teamSortBy"
               :sort-desc.sync="teamSortDesc">
               <template slot="position" slot-scope="data">
@@ -97,16 +99,16 @@
                 </div>
               </template>
             </b-table>
-            <h4 v-else class="text-center">
-              <b-spinner></b-spinner>
-            </h4>
+            <div v-if="$store.getters.parsedTeamRanking(site).length === 0">
+              <p class="text-center">No games, no ranking</p>
+            </div>
           </b-col>
+          <div class="w-100 text-center" v-else>
+            <b-spinner></b-spinner>
+          </div>
         </b-row>
       </b-tab>
     </b-tabs>
-    <div class="text-center" v-else>
-      <b-spinner></b-spinner>
-    </div>
   </div>
 </template>
 
@@ -118,11 +120,11 @@ import SITES from '../utils/sites';
 export default {
   name: 'Ranking',
   components: {
-    'v-select': vSelect,
+    vSelect,
   },
   data() {
     return {
-      rankingSite: SITES.CATANIA,
+      site: SITES.CATANIA,
       playerSortBy: 'rating',
       playerSortDesc: true,
       playerTableFields: [
@@ -155,12 +157,12 @@ export default {
       return Object.keys(SITES).map(site => SITES[site]);
     },
   },
-  async mounted() {
-    this.$store.dispatch('getGames');
-  },
   methods: {
     parseFullName(item) {
       return parseFullName(item.fullName);
+    },
+    siteChange(site) {
+      this.$store.dispatch('getRanking', site);
     },
   },
 };

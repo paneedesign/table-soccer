@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 import { firestore } from '../firebase';
 import SITES from '../utils/sites';
 import { parseGames, parsePlayerRanking, parseTeamRanking } from '../utils/parse';
-import { getPlayersRanking, getTeamsRanking } from '../utils/ranking';
+import { getPlayersRanking } from '../utils/ranking';
 import { getRandomUpcomingGames, getUpcomingGames } from '../utils/games';
 import { getPlayerIdByUid } from '../utils/players';
 
@@ -14,6 +14,10 @@ const mutationTypes = {
   GET_PLAYERS_SUCCESS: 'GET_PLAYERS_SUCCESS',
   GET_GAMES_START: 'GET_GAMES_START',
   GET_GAMES_SUCCESS: 'GET_GAMES_SUCCESS',
+  GET_PLAYERS_RANKING_START: 'GET_PLAYERS_RANKING_START',
+  GET_PLAYERS_RANKING_SUCCESS: 'GET_PLAYERS_RANKING_SUCCESS',
+  GET_TEAM_RANKING_START: 'GET_TEAM_RANKING_START',
+  GET_TEAM_RANKING_SUCCESS: 'GET_TEAM_RANKING_SUCCESS',
   SET_PLAYERS_RANKING: 'SET_PLAYERS_RANKING',
   SET_TEAM_RANKING: 'SET_TEAM_RANKING',
   SET_UPCOMING_GAMES: 'SET_UPCOMING_GAMES',
@@ -28,6 +32,8 @@ export default new Vuex.Store({
     pending: {
       playersRef: false,
       gamesRef: false,
+      playersRanking: false,
+      teamsRanking: false,
     },
     playersRanking: {},
     teamsRanking: {},
@@ -58,14 +64,30 @@ export default new Vuex.Store({
       state.pending.gamesRef = false;
       state.gamesRef = gamesRef;
     },
-    [mutationTypes.SET_PLAYERS_RANKING](state, payload) {
-      const { gamesRef, site } = payload;
-      state.playersRanking[site] = getPlayersRanking(gamesRef, state.playersRef, site);
+    [mutationTypes.GET_PLAYERS_RANKING_START](state) {
+      state.pending.playersRanking = true;
     },
-    [mutationTypes.SET_TEAM_RANKING](state, payload) {
-      const { gamesRef, site } = payload;
-      state.teamsRanking[site] = getTeamsRanking(gamesRef, state.playersRef, site);
+    [mutationTypes.GET_PLAYERS_RANKING_SUCCESS](state, payload) {
+      const { site, data } = payload;
+      state.pending.playersRanking = false;
+      Vue.set(state.playersRanking, site, data);
     },
+    [mutationTypes.GET_TEAM_RANKING_START](state) {
+      state.pending.teamsRanking = true;
+    },
+    [mutationTypes.GET_TEAM_RANKING_SUCCESS](state, payload) {
+      const { site, data } = payload;
+      state.pending.teamsRanking = false;
+      Vue.set(state.teamsRanking, site, data);
+    },
+    // [mutationTypes.SET_PLAYERS_RANKING](state, payload) {
+    //   const { gamesRef, site } = payload;
+    //   state.playersRanking[site] = getPlayersRanking(gamesRef, state.playersRef, site);
+    // },
+    // [mutationTypes.SET_TEAM_RANKING](state, payload) {
+    //   const { gamesRef, site } = payload;
+    //   state.teamsRanking[site] = getTeamsRanking(gamesRef, state.playersRef, site);
+    // },
     [mutationTypes.SET_UPCOMING_GAMES](state, unavailablePlayers) {
       const playersRef = state.playersRef
         .filter(playerRef => playerRef.data().site === SITES.CATANIA);
@@ -124,18 +146,43 @@ export default new Vuex.Store({
           const gamesRef = [];
           querySnapshot.forEach(doc => gamesRef.push(doc));
           commit(mutationTypes.GET_GAMES_SUCCESS, gamesRef);
+        });
+    },
+    async getRanking({ dispatch }, site) {
+      await dispatch('getPlayers');
+      dispatch('getPlayerRanking', site);
+      dispatch('getTeamRanking', site);
+    },
+    getPlayerRanking({ commit }, site) {
+      commit(mutationTypes.GET_PLAYERS_RANKING_START);
 
-          Object.keys(SITES).forEach((key) => {
-            const site = SITES[key];
-            commit(mutationTypes.SET_PLAYERS_RANKING, {
-              gamesRef,
+      firestore
+        .collection('playersRanking')
+        .doc(site)
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            commit(mutationTypes.GET_PLAYERS_RANKING_SUCCESS, {
               site,
+              data: doc.data(),
             });
-            commit(mutationTypes.SET_TEAM_RANKING, {
-              gamesRef,
+          }
+        });
+    },
+    getTeamRanking({ commit }, site) {
+      commit(mutationTypes.GET_TEAM_RANKING_START);
+
+      firestore
+        .collection('teamsRanking')
+        .doc(site)
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            commit(mutationTypes.GET_TEAM_RANKING_SUCCESS, {
               site,
+              data: doc.data(),
             });
-          });
+          }
         });
     },
     getUpcomingGames({ commit }, unavailablePlayers) {

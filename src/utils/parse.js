@@ -8,7 +8,7 @@ const parseFullName = (fullName) => {
   return `${name} ${surname.charAt(0).toUpperCase()}. ${other.map(o => `${o.charAt(0).toUpperCase()}.`)}`;
 };
 
-const parseDate = (date, time = true) => `${`${date.getDate() < 10 ? '0' : ''}${date.getDate()}/${`${date.getMonth() < 10 ? '0' : ''}${date.getMonth() + 1}`}`}/${date.getFullYear()} ${time ? `${date.getHours()}:${`${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}`}:${date.getSeconds() < 10 ? '0' : ''}${date.getSeconds()}` : ''}`;
+const parseDate = (date, time = true) => `${date.toLocaleString()} ${time ? `${date.getHours()}:${`${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}`}:${date.getSeconds() < 10 ? '0' : ''}${date.getSeconds()}` : ''}`;
 
 const parseGames = (gamesRef, playersRef) => {
   const games = [];
@@ -38,29 +38,32 @@ const parseGames = (gamesRef, playersRef) => {
   return games;
 };
 
-const parsePlayerRanking = (rankingArray, playersRef) => rankingArray.map((ranking) => {
-  const { playerId, ...otherProps } = ranking;
-  const player = getPlayerData(playerId, playersRef);
+const parsePlayerRanking = (rankingArray, playersRef) => Object.keys(rankingArray)
+  .map((rankingKey) => {
+    const ranking = rankingArray[rankingKey];
+    const player = getPlayerData(rankingKey, playersRef);
 
-  return {
-    player,
-    lost: ranking.played - ranking.won,
-    ...otherProps,
-  };
-}).filter(rankingPlayer => rankingPlayer.player.enabled && rankingPlayer.played > minPlayedMatch);
+    return {
+      player,
+      lost: ranking.played - ranking.won,
+      ...ranking,
+    };
+  }).filter(rankingPlayer => rankingPlayer.player.enabled && rankingPlayer.played > minPlayedMatch);
 
-const parseTeamRanking = (rankingArray, playersRef) => rankingArray.map((ranking) => {
-  const { defenderId, strikerId, ...otherProps } = ranking;
-  const defender = getPlayerData(defenderId, playersRef);
-  const striker = getPlayerData(strikerId, playersRef);
+const parseTeamRanking = (rankingArray, playersRef) => Object.keys(rankingArray)
+  .map((rankingKey) => {
+    const ranking = rankingArray[rankingKey];
+    const [defenderId, strikerId] = rankingKey.split('-');
+    const defender = getPlayerData(defenderId, playersRef);
+    const striker = getPlayerData(strikerId, playersRef);
 
-  return {
-    defender,
-    striker,
-    lost: ranking.played - ranking.won,
-    ...otherProps,
-  };
-}).filter(rankingPlayer => rankingPlayer.defender.enabled && rankingPlayer.striker.enabled);
+    return {
+      defender,
+      striker,
+      lost: ranking.played - ranking.won,
+      ...ranking,
+    };
+  }).filter(rankingPlayer => rankingPlayer.defender.enabled && rankingPlayer.striker.enabled);
 
 const parsePlayerListToGames = (players) => {
   const teams = [];
