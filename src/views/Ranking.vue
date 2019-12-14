@@ -24,7 +24,7 @@
                      hover
                      borderless
                      :fields="playerTableFields"
-                     :items="$store.getters.parsedPlayerRanking(site)"
+                     :items="$store.getters.formatPlayerRanking(site)"
                      :sort-by.sync="playerSortBy"
                      :sort-desc.sync="playerSortDesc">
               <template slot="position" slot-scope="data">
@@ -40,13 +40,13 @@
                     width="45"
                     height="45" />
                   <div class="d-flex flex-column">
-                    <span>{{ parseFullName(data.item.player) }}</span>
+                    <span>{{ data.item.player.fullName | formatFullName }}</span>
                     <small>{{ data.item.player.role }}</small>
                   </div>
                 </div>
               </template>
             </b-table>
-            <div v-if="$store.getters.parsedPlayerRanking(site).length === 0">
+            <div v-if="$store.getters.formatPlayerRanking(site).length === 0">
               <p class="text-center">No games, no ranking</p>
             </div>
           </b-col>
@@ -64,7 +64,7 @@
               hover
               borderless
               :fields="teamTableFields"
-              :items="$store.getters.parsedTeamRanking(site)"
+              :items="$store.getters.formatTeamRanking(site)"
               :sort-by.sync="teamSortBy"
               :sort-desc.sync="teamSortDesc">
               <template slot="position" slot-scope="data">
@@ -80,7 +80,7 @@
                     width="20"
                     height="20" />
                   <div>
-                    <span>{{ parseFullName(data.item.defender) }}</span>
+                    <span>{{ data.item.defender.fullName | formatFullName }}</span>
                   </div>
                 </div>
               </template>
@@ -94,12 +94,12 @@
                     width="20"
                     height="20" />
                   <div>
-                    <span>{{ parseFullName(data.item.striker) }}</span>
+                    <span>{{ data.item.striker.fullName | formatFullName }}</span>
                   </div>
                 </div>
               </template>
             </b-table>
-            <div v-if="$store.getters.parsedTeamRanking(site).length === 0">
+            <div v-if="$store.getters.formatTeamRanking(site).length === 0">
               <p class="text-center">No games, no ranking</p>
             </div>
           </b-col>
@@ -114,7 +114,6 @@
 
 <script>
 import vSelect from 'vue-select';
-import { parseFullName } from '../utils/parse';
 import SITES from '../utils/sites';
 
 export default {
@@ -158,9 +157,6 @@ export default {
     },
   },
   methods: {
-    parseFullName(item) {
-      return parseFullName(item.fullName);
-    },
     siteChange(site) {
       this.$store.dispatch('fetchRanking', site);
     },

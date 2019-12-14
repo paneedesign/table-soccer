@@ -15,7 +15,7 @@
         striped
         hover
         borderless
-        :items="$store.getters.parsedGames"
+        :items="$store.getters.formatGames"
         :fields="tableFields"
         :sort-by.sync="gamesSortBy"
         :sort-desc.sync="gamesSortDesc">
@@ -30,7 +30,7 @@
               width="20"
               height="20" />
             <div>
-              <span>{{ parseFullName(data.item.redDefender) }}</span>
+              <span>{{ data.item.redDefender.fullName | formatFullName }}</span>
             </div>
           </div>
         </template>
@@ -45,7 +45,7 @@
               width="20"
               height="20" />
             <div>
-              <span>{{ parseFullName(data.item.redStriker) }}</span>
+              <span>{{ data.item.redStriker.fullName | formatFullName }}</span>
             </div>
           </div>
         </template>
@@ -60,7 +60,7 @@
               width="20"
               height="20" />
             <div>
-              <span>{{ parseFullName(data.item.blueDefender) }}</span>
+              <span>{{ data.item.blueDefender.fullName | formatFullName }}</span>
             </div>
           </div>
         </template>
@@ -75,7 +75,7 @@
               width="20"
               height="20" />
             <div>
-              <span>{{ parseFullName(data.item.blueStriker) }}</span>
+              <span>{{ data.item.blueStriker.fullName | formatFullName }}</span>
             </div>
           </div>
         </template>
@@ -209,7 +209,6 @@ import vSelect from 'vue-select';
 import infiniteScroll from 'vue-infinite-scroll';
 import SITES from '../utils/sites';
 import { firestore } from '../firebase';
-import { parseFullName } from '../utils/parse';
 
 const gameModel = () => ({
   redTeam: {
@@ -263,7 +262,6 @@ export default {
       return !this.$store.getters.hasMoreGames;
     },
     players() {
-      // TODO: Refactor this
       return this.$store.state.playersRef
         .filter((playersRef) => {
           const { id } = playersRef;
@@ -297,9 +295,6 @@ export default {
         console.log('more');
         this.$store.dispatch('fetchMoreGames');
       }
-    },
-    parseFullName(item) {
-      return parseFullName(item.fullName);
     },
     redTeamWon(game) {
       return Number(game.redScore) > Number(game.blueScore);

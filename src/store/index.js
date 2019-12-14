@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import { firestore } from '../firebase';
-import { parseGames, parsePlayerRanking, parseTeamRanking } from '../utils/parse';
-import { getPlayerIdByUid } from '../utils/players';
+import getPlayerData from '../utils/player';
+import config from '../config';
 
 Vue.use(Vuex);
 
@@ -40,15 +40,47 @@ export default new Vuex.Store({
     },
   },
   getters: {
-    playersRefBySite: state => site => state.playersRef
-      .filter(playerRef => playerRef.data().site === site),
-    parsedGames: state => parseGames(state.games.data, state.playersRef),
-    parsedPlayerRanking:
-      state => site => parsePlayerRanking(state.playersRanking[site], state.playersRef),
-    parsedTeamRanking:
-      state => site => parseTeamRanking(state.teamsRanking[site], state.playersRef),
-    getPlayerIdByUid: state => uid => getPlayerIdByUid(uid, state.playersRef),
+    formatGames: state => state.games.data.map(game => ({
+      id: game.docId,
+      redDefender: getPlayerData(game.redTeam.defender.id, state.playersRef),
+      redStriker: getPlayerData(game.redTeam.striker.id, state.playersRef),
+      blueDefender: getPlayerData(game.blueTeam.defender.id, state.playersRef),
+      blueStriker: getPlayerData(game.blueTeam.striker.id, state.playersRef),
+      redScore: game.redTeam.score,
+      blueScore: game.blueTeam.score,
+      site: game.site,
+      timestamp: game.timestamp.toDate(),
+    })),
     hasMoreGames: state => state.games.pagination.next,
+    formatPlayerRanking: state => site => Object.keys(state.playersRanking[site])
+      .map((playerId) => {
+        const ranking = state.playersRanking[site][playerId];
+        const player = getPlayerData(playerId, state.playersRef);
+
+        return {
+          player,
+          lost: ranking.played - ranking.won,
+          ...ranking,
+        };
+      })
+      .filter(ranking => ranking.player.enabled
+          && ranking.played > config.playerRankingMinPlayedGames),
+    formatTeamRanking:
+      state => site => Object.keys(state.playersRanking[site])
+        .map((rankingKey) => {
+          const ranking = state.playersRanking[site][rankingKey];
+          const [defenderId, strikerId] = rankingKey.split('-');
+          const defender = getPlayerData(defenderId, state.playersRef);
+          const striker = getPlayerData(strikerId, state.playersRef);
+
+          return {
+            defender,
+            striker,
+            lost: ranking.played - ranking.won,
+            ...ranking,
+          };
+        }).filter(ranking => ranking.defender.enabled
+          && ranking.striker.enabled),
   },
   mutations: {
     [mutationTypes.GET_PLAYERS_START](state) {
