@@ -22,10 +22,10 @@ const mutationTypes = {
 export default new Vuex.Store({
   state: {
     playersRef: [],
-    gamesRef: [],
+    games: [],
     pending: {
       playersRef: false,
-      gamesRef: false,
+      games: false,
       playersRanking: false,
       teamsRanking: false,
     },
@@ -35,7 +35,7 @@ export default new Vuex.Store({
   getters: {
     playersRefBySite: state => site => state.playersRef
       .filter(playerRef => playerRef.data().site === site),
-    parsedGames: state => parseGames(state.gamesRef, state.playersRef),
+    parsedGames: state => parseGames(state.games, state.playersRef),
     parsedPlayerRanking:
       state => site => parsePlayerRanking(state.playersRanking[site], state.playersRef),
     parsedTeamRanking:
@@ -51,11 +51,11 @@ export default new Vuex.Store({
       state.playersRef = playersRef;
     },
     [mutationTypes.GET_GAMES_START](state) {
-      state.pending.gamesRef = true;
+      state.pending.games = true;
     },
-    [mutationTypes.GET_GAMES_SUCCESS](state, gamesRef) {
-      state.pending.gamesRef = false;
-      state.gamesRef = gamesRef;
+    [mutationTypes.GET_GAMES_SUCCESS](state, payload) {
+      state.pending.games = false;
+      state.games = payload.data;
     },
     [mutationTypes.GET_PLAYERS_RANKING_START](state) {
       state.pending.playersRanking = true;
@@ -89,8 +89,9 @@ export default new Vuex.Store({
           commit(mutationTypes.GET_PLAYERS_SUCCESS, playersRef);
         });
     },
-    async getGames({ state, commit, dispatch }) {
-      if (state.gamesRef.length) return;
+    async getGames({ commit, dispatch }) {
+      // todo: remove this
+      // if (state.games.length) return;
 
       await dispatch('getPlayers');
       commit(mutationTypes.GET_GAMES_START);
@@ -99,9 +100,14 @@ export default new Vuex.Store({
         .collection('games')
         .orderBy('timestamp', 'asc')
         .onSnapshot((querySnapshot) => {
-          const gamesRef = [];
-          querySnapshot.forEach(doc => gamesRef.push(doc));
-          commit(mutationTypes.GET_GAMES_SUCCESS, gamesRef);
+          const data = [];
+          querySnapshot.forEach(doc => data.push({
+            docId: doc.id,
+            ...doc.data(),
+          }));
+          commit(mutationTypes.GET_GAMES_SUCCESS, {
+            data,
+          });
         });
     },
     async getRanking({ dispatch }, site) {
