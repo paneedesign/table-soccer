@@ -8,7 +8,7 @@
         <b-button v-b-modal.modal-prevent.add-game>Add game</b-button>
       </b-col>
     </b-row>
-    <template v-if="$store.state.games.length">
+    <div v-if="$store.state.games.data.length">
       <b-table
         id="games-table"
         responsive
@@ -17,8 +17,6 @@
         borderless
         :items="$store.getters.parsedGames"
         :fields="tableFields"
-        :per-page="perPage"
-        :current-page="currentPage"
         :sort-by.sync="gamesSortBy"
         :sort-desc.sync="gamesSortDesc">
         <template slot="redDefender" slot-scope="data">
@@ -97,17 +95,15 @@
           </div>
         </template>
       </b-table>
-      <b-pagination
-        align="center"
-        v-model="currentPage"
-        :total-rows="$store.getters.parsedGames.length"
-        :per-page="perPage"
-        aria-controls="games-table"
-      ></b-pagination>
-    </template>
-    <div class="text-center" v-else>
+    </div>
+    <div v-if="isLoading"
+         class="text-center">
       <b-spinner></b-spinner>
     </div>
+
+    <div v-infinite-scroll="loadMore"
+         infinite-scroll-disabled="isInfiniteScrollDisabled"
+         infinite-scroll-immediate-check="false"></div>
 
     <!-- Modals -->
     <b-modal
@@ -210,6 +206,7 @@
 
 <script>
 import vSelect from 'vue-select';
+import infiniteScroll from 'vue-infinite-scroll';
 import SITES from '../utils/sites';
 import { firestore } from '../firebase';
 import { parseFullName } from '../utils/parse';
@@ -230,12 +227,13 @@ const gameModel = () => ({
 
 export default {
   name: 'Games',
+  directives: {
+    infiniteScroll,
+  },
   data() {
     return {
       pending: false,
       gameIdToRemove: null,
-      perPage: 10,
-      currentPage: 1,
       tableFields: [
         'redDefender',
         'redStriker',
@@ -257,6 +255,13 @@ export default {
     vSelect,
   },
   computed: {
+    isLoading() {
+      return this.$store.state.pending.playersRef
+      || this.$store.state.games.pending;
+    },
+    isInfiniteScrollDisabled() {
+      return !this.$store.getters.hasMoreGames;
+    },
     players() {
       // TODO: Refactor this
       return this.$store.state.playersRef
@@ -284,9 +289,15 @@ export default {
     },
   },
   mounted() {
-    this.$store.dispatch('getGames');
+    this.$store.dispatch('fetchGames');
   },
   methods: {
+    loadMore() {
+      if (!this.isLoading) {
+        console.log('more');
+        this.$store.dispatch('fetchMoreGames');
+      }
+    },
     parseFullName(item) {
       return parseFullName(item.fullName);
     },

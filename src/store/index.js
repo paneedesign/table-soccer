@@ -11,6 +11,8 @@ const mutationTypes = {
   GET_PLAYERS_SUCCESS: 'GET_PLAYERS_SUCCESS',
   GET_GAMES_START: 'GET_GAMES_START',
   GET_GAMES_SUCCESS: 'GET_GAMES_SUCCESS',
+  GET_MORE_GAMES_START: 'GET_MORE_GAMES_START',
+  GET_MORE_GAMES_SUCCESS: 'GET_MORE_GAMES_SUCCESS',
   GET_PLAYERS_RANKING_START: 'GET_PLAYERS_RANKING_START',
   GET_PLAYERS_RANKING_SUCCESS: 'GET_PLAYERS_RANKING_SUCCESS',
   GET_TEAM_RANKING_START: 'GET_TEAM_RANKING_START',
@@ -22,25 +24,31 @@ const mutationTypes = {
 export default new Vuex.Store({
   state: {
     playersRef: [],
-    games: [],
-    pending: {
-      playersRef: false,
-      games: false,
-      playersRanking: false,
-      teamsRanking: false,
+    games: {
+      data: [],
+      pending: false,
+      pagination: {
+        next: undefined,
+      },
     },
     playersRanking: {},
     teamsRanking: {},
+    pending: {
+      playersRef: false,
+      playersRanking: false,
+      teamsRanking: false,
+    },
   },
   getters: {
     playersRefBySite: state => site => state.playersRef
       .filter(playerRef => playerRef.data().site === site),
-    parsedGames: state => parseGames(state.games, state.playersRef),
+    parsedGames: state => parseGames(state.games.data, state.playersRef),
     parsedPlayerRanking:
       state => site => parsePlayerRanking(state.playersRanking[site], state.playersRef),
     parsedTeamRanking:
       state => site => parseTeamRanking(state.teamsRanking[site], state.playersRef),
     getPlayerIdByUid: state => uid => getPlayerIdByUid(uid, state.playersRef),
+    hasMoreGames: state => state.games.pagination.next,
   },
   mutations: {
     [mutationTypes.GET_PLAYERS_START](state) {
@@ -51,11 +59,22 @@ export default new Vuex.Store({
       state.playersRef = playersRef;
     },
     [mutationTypes.GET_GAMES_START](state) {
-      state.pending.games = true;
+      state.games.pending = true;
     },
     [mutationTypes.GET_GAMES_SUCCESS](state, payload) {
-      state.pending.games = false;
-      state.games = payload.data;
+      const { pagination, data } = payload;
+      state.games.pending = false;
+      state.games.pagination = pagination;
+      state.games.data = data;
+    },
+    [mutationTypes.GET_MORE_GAMES_START](state) {
+      state.games.pending = true;
+    },
+    [mutationTypes.GET_MORE_GAMES_SUCCESS](state, payload) {
+      const { pagination, data } = payload;
+      state.games.pending = false;
+      state.games.pagination = pagination;
+      state.games.data.push(...data);
     },
     [mutationTypes.GET_PLAYERS_RANKING_START](state) {
       state.pending.playersRanking = true;
@@ -75,7 +94,7 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    getPlayers({ state, commit }) {
+    fetchPlayers({ state, commit }) {
       if (state.playersRef.length) return Promise.resolve;
 
       commit(mutationTypes.GET_PLAYERS_START);
@@ -89,33 +108,66 @@ export default new Vuex.Store({
           commit(mutationTypes.GET_PLAYERS_SUCCESS, playersRef);
         });
     },
-    async getGames({ commit, dispatch }) {
-      // todo: remove this
-      // if (state.games.length) return;
-
-      await dispatch('getPlayers');
+    async fetchGames({ commit, dispatch }) {
+      await dispatch('fetchPlayers');
       commit(mutationTypes.GET_GAMES_START);
 
-      firestore
-        .collection('games')
-        .orderBy('timestamp', 'asc')
-        .onSnapshot((querySnapshot) => {
+      const gamesRef = firestore.collection('games');
+
+      gamesRef
+        .orderBy('timestamp', 'desc')
+        .limit(20)
+        .get()
+        .then((querySnapshot) => {
           const data = [];
+
           querySnapshot.forEach(doc => data.push({
             docId: doc.id,
             ...doc.data(),
           }));
+
           commit(mutationTypes.GET_GAMES_SUCCESS, {
             data,
+            pagination: {
+              next: querySnapshot.docs[querySnapshot.docs.length - 1],
+            },
           });
         });
     },
-    async getRanking({ dispatch }, site) {
-      await dispatch('getPlayers');
-      dispatch('getPlayerRanking', site);
-      dispatch('getTeamRanking', site);
+    fetchMoreGames({ state, commit }) {
+      if (state.games.pending) return;
+      commit(mutationTypes.GET_MORE_GAMES_START);
+
+      const gamesRef = firestore.collection('games');
+
+      gamesRef
+        .orderBy('timestamp', 'desc')
+        .startAfter(state.games.pagination.next)
+        .limit(20)
+        .get()
+        .then((querySnapshot) => {
+          const next = querySnapshot.docs[querySnapshot.docs.length - 1];
+          const data = [];
+
+          querySnapshot.forEach(doc => data.push({
+            docId: doc.id,
+            ...doc.data(),
+          }));
+
+          commit(mutationTypes.GET_MORE_GAMES_SUCCESS, {
+            data,
+            pagination: {
+              next,
+            },
+          });
+        });
     },
-    getPlayerRanking({ commit }, site) {
+    async fetchRanking({ dispatch }, site) {
+      await dispatch('fetchPlayers');
+      dispatch('fetchPlayerRanking', site);
+      dispatch('fetchTeamRanking', site);
+    },
+    fetchPlayerRanking({ commit }, site) {
       commit(mutationTypes.GET_PLAYERS_RANKING_START);
 
       firestore
@@ -130,7 +182,7 @@ export default new Vuex.Store({
           }
         });
     },
-    getTeamRanking({ commit }, site) {
+    fetchTeamRanking({ commit }, site) {
       commit(mutationTypes.GET_TEAM_RANKING_START);
 
       firestore

@@ -162,7 +162,7 @@ export default {
       return parseFullName(item.fullName);
     },
     siteChange(site) {
-      this.$store.dispatch('getRanking', site);
+      this.$store.dispatch('fetchRanking', site);
     },
   },
 };
