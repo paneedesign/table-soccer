@@ -111,9 +111,6 @@
           </b-col>
         </b-row>
       </b-tab>
-      <b-tab title="Upcoming games (Catania)">
-        <upcoming-games />
-      </b-tab>
     </b-tabs>
     <div class="text-center" v-else>
       <b-spinner></b-spinner>
@@ -223,7 +220,6 @@ import vSelect from 'vue-select';
 import SITES from '../utils/sites';
 import { firestore } from '../firebase';
 import { parseFullName } from '../utils/parse';
-import UpcomingGames from '../components/Games/UpcomingGames.vue';
 
 const gameModel = () => ({
   redTeam: {
@@ -265,11 +261,11 @@ export default {
     };
   },
   components: {
-    UpcomingGames,
-    'v-select': vSelect,
+    vSelect,
   },
   computed: {
     players() {
+      // TODO: Refactor this
       return this.$store.state.playersRef
         .filter((playersRef) => {
           const { id } = playersRef;

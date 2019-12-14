@@ -1,5 +1,4 @@
 import { getPlayerData } from './players';
-import ROLES from './roles';
 
 const minPlayedMatch = 15;
 
@@ -65,51 +64,10 @@ const parseTeamRanking = (rankingArray, playersRef) => Object.keys(rankingArray)
     };
   }).filter(rankingPlayer => rankingPlayer.defender.enabled && rankingPlayer.striker.enabled);
 
-const parsePlayerListToGames = (players) => {
-  const teams = [];
-  let j = 0;
-
-  for (let i = 0; i < Math.ceil(players.length * 0.5); i += 1) {
-    const playerOne = players[i + j];
-    const playerTwo = players[i + j + 1];
-    let tmpDefender = playerOne;
-    let tmpStriker = playerTwo;
-
-    if ((playerOne.role !== ROLES.DEFENDER && playerOne.role !== ROLES.ANY)
-      || (playerOne.role === ROLES.ANY && playerTwo.role !== ROLES.STRIKER)) {
-      tmpDefender = playerTwo;
-      tmpStriker = playerOne;
-    }
-
-    teams.push({
-      defender: tmpDefender,
-      striker: tmpStriker,
-    });
-
-    j += 1;
-  }
-
-  const games = [];
-  j = 0;
-
-  for (let i = 0; i < Math.ceil(teams.length * 0.5); i += 1) {
-    games.push({
-      id: i,
-      redTeam: teams[i + j],
-      blueTeam: teams[i + j + 1],
-    });
-
-    j += 1;
-  }
-
-  return games;
-};
-
 export {
   parseDate,
   parseGames,
   parseFullName,
   parsePlayerRanking,
   parseTeamRanking,
-  parsePlayerListToGames,
 };

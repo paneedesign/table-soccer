@@ -1,10 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import { firestore } from '../firebase';
-import SITES from '../utils/sites';
 import { parseGames, parsePlayerRanking, parseTeamRanking } from '../utils/parse';
-import { getPlayersRanking } from '../utils/ranking';
-import { getRandomUpcomingGames, getUpcomingGames } from '../utils/games';
 import { getPlayerIdByUid } from '../utils/players';
 
 Vue.use(Vuex);
@@ -20,9 +17,6 @@ const mutationTypes = {
   GET_TEAM_RANKING_SUCCESS: 'GET_TEAM_RANKING_SUCCESS',
   SET_PLAYERS_RANKING: 'SET_PLAYERS_RANKING',
   SET_TEAM_RANKING: 'SET_TEAM_RANKING',
-  SET_UPCOMING_GAMES: 'SET_UPCOMING_GAMES',
-  SET_UPCOMING_GAMES_RANDOMLY: 'SET_UPCOMING_GAMES_RANDOMLY',
-  REMOVE_UPCOMING_GAME: 'REMOVE_UPCOMING_GAME',
 };
 
 export default new Vuex.Store({
@@ -37,7 +31,6 @@ export default new Vuex.Store({
     },
     playersRanking: {},
     teamsRanking: {},
-    upcomingGames: [],
   },
   getters: {
     playersRefBySite: state => site => state.playersRef
@@ -88,35 +81,6 @@ export default new Vuex.Store({
     //   const { gamesRef, site } = payload;
     //   state.teamsRanking[site] = getTeamsRanking(gamesRef, state.playersRef, site);
     // },
-    [mutationTypes.SET_UPCOMING_GAMES](state, unavailablePlayers) {
-      const playersRef = state.playersRef
-        .filter(playerRef => playerRef.data().site === SITES.CATANIA);
-      const playersRanking = getPlayersRanking(state.gamesRef, state.playersRef, SITES.CATANIA)
-        .filter(playerRanking => playersRef
-          .find(playerRef => playerRef.id === playerRanking.playerId));
-
-      state.upcomingGames = getUpcomingGames(
-        playersRanking,
-        unavailablePlayers,
-        playersRef,
-      );
-    },
-    [mutationTypes.SET_UPCOMING_GAMES_RANDOMLY](state, unavailablePlayers) {
-      const playersRef = state.playersRef
-        .filter(playerRef => playerRef.data().site === SITES.CATANIA);
-      const playersRanking = getPlayersRanking(state.gamesRef, state.playersRef, SITES.CATANIA)
-        .filter(playerRanking => playersRef
-          .find(playerRef => playerRef.id === playerRanking.playerId));
-
-      state.upcomingGames = getRandomUpcomingGames(
-        playersRanking,
-        unavailablePlayers,
-        playersRef,
-      );
-    },
-    [mutationTypes.REMOVE_UPCOMING_GAME](state, upcomingGameIndex) {
-      state.upcomingGames.splice(upcomingGameIndex, 1);
-    },
   },
   actions: {
     getPlayers({ state, commit }) {
@@ -184,17 +148,6 @@ export default new Vuex.Store({
             });
           }
         });
-    },
-    getUpcomingGames({ commit }, unavailablePlayers) {
-      commit('SET_UPCOMING_GAMES', unavailablePlayers);
-    },
-    getUpcomingGamesRandomly({ commit }, unavailablePlayers) {
-      commit('SET_UPCOMING_GAMES_RANDOMLY', unavailablePlayers);
-    },
-    removeUpcomingGame({ state, commit }, game) {
-      const upcomingGameIndex = state.upcomingGames
-        .findIndex(games => games.id === game.id);
-      commit('REMOVE_UPCOMING_GAME', upcomingGameIndex);
     },
   },
 });
