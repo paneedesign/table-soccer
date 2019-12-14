@@ -255,28 +255,18 @@ export default {
   },
   computed: {
     isLoading() {
-      return this.$store.state.pending.playersRef
+      return this.$store.state.playersRef.pending
       || this.$store.state.games.pending;
     },
     isInfiniteScrollDisabled() {
       return !this.$store.getters.hasMoreGames;
     },
     players() {
-      return this.$store.state.playersRef
-        .filter((playersRef) => {
-          const { id } = playersRef;
-
-          if (
-            (this.newGame.redTeam.defender && this.newGame.redTeam.defender.value === id)
-              || (this.newGame.redTeam.striker && this.newGame.redTeam.striker.value === id)
-              || (this.newGame.blueTeam.defender && this.newGame.blueTeam.defender.value === id)
-              || (this.newGame.blueTeam.striker && this.newGame.blueTeam.striker.value === id)
-          ) {
-            return false;
-          }
-
-          return true;
-        })
+      return this.$store.state.playersRef.data
+        .filter(({ id }) => !((this.newGame.redTeam.defender && this.newGame.redTeam.defender.value === id) // eslint-disable-line
+          || (this.newGame.redTeam.striker && this.newGame.redTeam.striker.value === id)
+          || (this.newGame.blueTeam.defender && this.newGame.blueTeam.defender.value === id)
+          || (this.newGame.blueTeam.striker && this.newGame.blueTeam.striker.value === id)))
         .map(playerRef => ({
           value: playerRef.id,
           label: playerRef.data().fullName,

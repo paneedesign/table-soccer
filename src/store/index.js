@@ -23,7 +23,10 @@ const mutationTypes = {
 
 export default new Vuex.Store({
   state: {
-    playersRef: [],
+    playersRef: {
+      data: [],
+      pending: false,
+    },
     games: {
       data: [],
       pending: false,
@@ -34,7 +37,6 @@ export default new Vuex.Store({
     playersRanking: {},
     teamsRanking: {},
     pending: {
-      playersRef: false,
       playersRanking: false,
       teamsRanking: false,
     },
@@ -42,10 +44,10 @@ export default new Vuex.Store({
   getters: {
     formatGames: state => state.games.data.map(game => ({
       id: game.docId,
-      redDefender: getPlayerData(game.redTeam.defender.id, state.playersRef),
-      redStriker: getPlayerData(game.redTeam.striker.id, state.playersRef),
-      blueDefender: getPlayerData(game.blueTeam.defender.id, state.playersRef),
-      blueStriker: getPlayerData(game.blueTeam.striker.id, state.playersRef),
+      redDefender: getPlayerData(game.redTeam.defender.id, state.playersRef.data),
+      redStriker: getPlayerData(game.redTeam.striker.id, state.playersRef.data),
+      blueDefender: getPlayerData(game.blueTeam.defender.id, state.playersRef.data),
+      blueStriker: getPlayerData(game.blueTeam.striker.id, state.playersRef.data),
       redScore: game.redTeam.score,
       blueScore: game.blueTeam.score,
       site: game.site,
@@ -55,7 +57,7 @@ export default new Vuex.Store({
     formatPlayerRanking: state => site => Object.keys(state.playersRanking[site])
       .map((playerId) => {
         const ranking = state.playersRanking[site][playerId];
-        const player = getPlayerData(playerId, state.playersRef);
+        const player = getPlayerData(playerId, state.playersRef.data);
 
         return {
           player,
@@ -70,8 +72,8 @@ export default new Vuex.Store({
         .map((rankingKey) => {
           const ranking = state.teamsRanking[site][rankingKey];
           const [defenderId, strikerId] = rankingKey.split('-');
-          const defender = getPlayerData(defenderId, state.playersRef);
-          const striker = getPlayerData(strikerId, state.playersRef);
+          const defender = getPlayerData(defenderId, state.playersRef.data);
+          const striker = getPlayerData(strikerId, state.playersRef.data);
 
           return {
             defender,
@@ -84,11 +86,11 @@ export default new Vuex.Store({
   },
   mutations: {
     [mutationTypes.GET_PLAYERS_START](state) {
-      state.pending.playersRef = true;
+      state.playersRef.pending = true;
     },
-    [mutationTypes.GET_PLAYERS_SUCCESS](state, playersRef) {
-      state.pending.playersRef = false;
-      state.playersRef = playersRef;
+    [mutationTypes.GET_PLAYERS_SUCCESS](state, payload) {
+      state.playersRef.pending = false;
+      state.playersRef.data = payload.data;
     },
     [mutationTypes.GET_GAMES_START](state) {
       state.games.pending = true;
@@ -127,7 +129,7 @@ export default new Vuex.Store({
   },
   actions: {
     fetchPlayers({ state, commit }) {
-      if (state.playersRef.length) return Promise.resolve;
+      if (state.playersRef.data.length) return Promise.resolve;
 
       commit(mutationTypes.GET_PLAYERS_START);
       return firestore
@@ -135,13 +137,18 @@ export default new Vuex.Store({
         .orderBy('fullName', 'asc')
         .get()
         .then((querySnapshot) => {
-          const playersRef = [];
-          querySnapshot.forEach(doc => playersRef.push(doc));
-          commit(mutationTypes.GET_PLAYERS_SUCCESS, playersRef);
+          const data = [];
+          querySnapshot.forEach(doc => data.push(doc));
+          commit(mutationTypes.GET_PLAYERS_SUCCESS, {
+            data,
+          });
         });
     },
-    async fetchGames({ commit, dispatch }) {
-      await dispatch('fetchPlayers');
+    async fetchGames({ state, commit, dispatch }) {
+      if (state.playersRef.data.length === 0) {
+        await dispatch('fetchPlayers');
+      }
+
       commit(mutationTypes.GET_GAMES_START);
 
       const gamesRef = firestore.collection('games');
@@ -194,8 +201,11 @@ export default new Vuex.Store({
           });
         });
     },
-    async fetchRanking({ dispatch }, site) {
-      await dispatch('fetchPlayers');
+    async fetchRanking({ state, dispatch }, site) {
+      if (state.playersRef.data.length === 0) {
+        await dispatch('fetchPlayers');
+      }
+
       dispatch('fetchPlayerRanking', site);
       dispatch('fetchTeamRanking', site);
     },
