@@ -1,11 +1,11 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { firestore } from './firebase';
-import SITES from './utils/sites';
-import { parseGames, parsePlayerRanking, parseTeamRanking } from './utils/parse';
-import { getPlayersRanking, getTeamsRanking } from './utils/ranking';
-import { getRandomUpcomingGames, getUpcomingGames } from './utils/games';
-import { getPlayerIdByUid } from './utils/players';
+import { firestore } from '../firebase';
+import SITES from '../utils/sites';
+import { parseGames, parsePlayerRanking, parseTeamRanking } from '../utils/parse';
+import { getPlayersRanking, getTeamsRanking } from '../utils/ranking';
+import { getRandomUpcomingGames, getUpcomingGames } from '../utils/games';
+import { getPlayerIdByUid } from '../utils/players';
 
 Vue.use(Vuex);
 
@@ -38,7 +38,7 @@ export default new Vuex.Store({
       .filter(playerRef => playerRef.data().site === site),
     parsedGames: state => parseGames(state.gamesRef, state.playersRef),
     parsedPlayerRanking:
-        state => site => parsePlayerRanking(state.playersRanking[site], state.playersRef),
+      state => site => parsePlayerRanking(state.playersRanking[site], state.playersRef),
     parsedTeamRanking:
       state => site => parseTeamRanking(state.teamsRanking[site], state.playersRef),
     getPlayerIdByUid: state => uid => getPlayerIdByUid(uid, state.playersRef),
