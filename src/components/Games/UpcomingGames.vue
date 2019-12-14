@@ -189,9 +189,7 @@ export default {
       firestore
         .collection('games')
         .add(data)
-        .then((docRef) => {
-          console.debug('Document written with ID: ', docRef.id);
-
+        .then(() => {
           // TODO: Do this when create action will be done in the store.
           this.$store.dispatch('removeUpcomingGame', game);
           this.$nextTick(() => {

@@ -318,7 +318,6 @@ export default {
     },
     handleRemoveOk() {
       firestore.collection('games').doc(this.gameIdToRemove).delete().then(() => {
-        console.debug('Document successfully deleted!');
         this.$toasted.show('Success: Game Removed', { type: 'success' });
         this.gameIdToRemove = null;
       })
@@ -368,9 +367,7 @@ export default {
       firestore
         .collection('games')
         .add(data)
-        .then((docRef) => {
-          console.debug('Document written with ID: ', docRef.id);
-
+        .then(() => {
           this.$nextTick(() => {
             this.$refs['add-game-modal'].hide();
             this.newGame = { ...gameModel() };

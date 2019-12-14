@@ -61,7 +61,6 @@ export default {
           let player = await this.getPlayer(result.user);
 
           if (!player) {
-            console.debug('Player not found, creating new player');
             player = await this.createPlayer(result.user);
           }
 
@@ -109,10 +108,7 @@ export default {
       return firestore
         .collection('players')
         .add(data)
-        .then((docRef) => {
-          console.debug('Document (Player) written with ID: ', docRef.id);
-          return data;
-        })
+        .then(() => data)
         .catch((error) => {
           console.error('Error creating player: ', error);
           this.$toasted.show(`Error: ${error.message}`, { type: 'error' });

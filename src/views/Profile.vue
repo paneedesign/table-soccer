@@ -135,8 +135,7 @@ export default {
         .collection('players')
         .doc(this.player.id)
         .update(data)
-        .then((response) => {
-          console.debug('Document successfully updated!', response);
+        .then(() => {
           this.player.role = this.newRole;
 
           this.$nextTick(() => {
@@ -184,8 +183,7 @@ export default {
         .collection('players')
         .doc(this.player.id)
         .update(data)
-        .then((response) => {
-          console.debug('Document successfully updated!', response);
+        .then(() => {
           this.player.site = this.newSite;
 
           this.$nextTick(() => {
@@ -226,7 +224,6 @@ export default {
         this.player = null;
         this.$router.go();
         this.$toasted.show('Success: Signed out successfully', { type: 'success' });
-        console.debug('Sign out successfully');
       }).catch((error) => {
         this.$toasted.show(`Error: ${error.message}`, { type: 'error' });
         console.error(error);
