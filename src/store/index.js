@@ -66,9 +66,9 @@ export default new Vuex.Store({
       .filter(ranking => ranking.player.enabled
           && ranking.played > config.playerRankingMinPlayedGames),
     formatTeamRanking:
-      state => site => Object.keys(state.playersRanking[site])
+      state => site => Object.keys(state.teamsRanking[site])
         .map((rankingKey) => {
-          const ranking = state.playersRanking[site][rankingKey];
+          const ranking = state.teamsRanking[site][rankingKey];
           const [defenderId, strikerId] = rankingKey.split('-');
           const defender = getPlayerData(defenderId, state.playersRef);
           const striker = getPlayerData(strikerId, state.playersRef);
