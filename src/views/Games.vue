@@ -8,8 +8,7 @@
         <b-button v-b-modal.modal-prevent.add-game>Add game</b-button>
       </b-col>
     </b-row>
-    <div v-if="$store.state.games.data.length">
-      <b-table
+    <b-table
         id="games-table"
         responsive
         striped
@@ -18,7 +17,9 @@
         :items="$store.getters.formatGames"
         :fields="tableFields"
         :sort-by.sync="gamesSortBy"
-        :sort-desc.sync="gamesSortDesc">
+        :sort-desc.sync="gamesSortDesc"
+        :busy="isLoading"
+        @sort-changed="sortingChanged">
         <template slot="redDefender" slot-scope="data">
           <div class="d-flex align-items-center"
                :class="{'team-won': redTeamWon(data.item)}">
@@ -95,7 +96,6 @@
           </div>
         </template>
       </b-table>
-    </div>
     <div v-if="isLoading"
          class="text-center">
       <b-spinner></b-spinner>
@@ -282,9 +282,14 @@ export default {
   methods: {
     loadMore() {
       if (!this.isLoading) {
-        console.log('more');
         this.$store.dispatch('fetchMoreGames');
       }
+    },
+    sortingChanged(context) {
+      this.$store.dispatch('changeGamesOrder', {
+        prop: context.sortBy,
+        value: context.sortDesc ? 'desc' : 'asc',
+      });
     },
     redTeamWon(game) {
       return Number(game.redScore) > Number(game.blueScore);

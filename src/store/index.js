@@ -13,6 +13,7 @@ const mutationTypes = {
   GET_GAMES_SUCCESS: 'GET_GAMES_SUCCESS',
   GET_MORE_GAMES_START: 'GET_MORE_GAMES_START',
   GET_MORE_GAMES_SUCCESS: 'GET_MORE_GAMES_SUCCESS',
+  SET_GAMES_ORDER_BY: 'SET_GAMES_ORDER_BY',
   GET_PLAYERS_RANKING_START: 'GET_PLAYERS_RANKING_START',
   GET_PLAYERS_RANKING_SUCCESS: 'GET_PLAYERS_RANKING_SUCCESS',
   GET_TEAM_RANKING_START: 'GET_TEAM_RANKING_START',
@@ -30,6 +31,10 @@ export default new Vuex.Store({
     games: {
       data: [],
       pending: false,
+      orderBy: {
+        prop: 'timestamp',
+        value: 'desc',
+      },
       pagination: {
         next: undefined,
       },
@@ -110,6 +115,9 @@ export default new Vuex.Store({
       state.games.pagination = pagination;
       state.games.data.push(...data);
     },
+    [mutationTypes.SET_GAMES_ORDER_BY](state, payload) {
+      state.games.orderBy = payload.orderBy;
+    },
     [mutationTypes.GET_PLAYERS_RANKING_START](state) {
       state.pending.playersRanking = true;
     },
@@ -152,7 +160,7 @@ export default new Vuex.Store({
       commit(mutationTypes.GET_GAMES_START);
 
       firestore.collection('games')
-        .orderBy('timestamp', 'desc')
+        .orderBy(state.games.orderBy.prop, state.games.orderBy.value)
         .limit(20)
         .onSnapshot((querySnapshot) => {
           const data = [];
@@ -175,7 +183,7 @@ export default new Vuex.Store({
       commit(mutationTypes.GET_MORE_GAMES_START);
 
       firestore.collection('games')
-        .orderBy('timestamp', 'desc')
+        .orderBy(state.games.orderBy.prop, state.games.orderBy.value)
         .startAfter(state.games.pagination.next)
         .limit(20)
         .get()
@@ -195,6 +203,12 @@ export default new Vuex.Store({
             },
           });
         });
+    },
+    changeGamesOrder({ commit, dispatch }, orderBy) {
+      commit(mutationTypes.SET_GAMES_ORDER_BY, {
+        orderBy,
+      });
+      dispatch('fetchGames');
     },
     async fetchRanking({ state, dispatch }, site) {
       if (state.playersRef.data.length === 0) {
