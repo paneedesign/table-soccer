@@ -11,6 +11,7 @@
           v-model="site"
           class="mb-3"
           :options="siteOptions"
+          :clearable="false"
           @change="siteChange"
           readonly></v-select>
       </b-col>
