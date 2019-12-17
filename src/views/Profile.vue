@@ -145,7 +145,6 @@ export default {
           });
         })
         .catch((error) => {
-          console.error('Error updating role: ', error);
           this.$toasted.show(`Error: ${error.message}`, { type: 'error' });
         })
         .finally(() => {
@@ -193,7 +192,6 @@ export default {
           });
         })
         .catch((error) => {
-          console.error('Error updating site: ', error);
           this.$toasted.show(`Error: ${error.message}`, { type: 'error' });
         })
         .finally(() => {
@@ -226,7 +224,6 @@ export default {
         this.$toasted.show('Success: Signed out successfully', { type: 'success' });
       }).catch((error) => {
         this.$toasted.show(`Error: ${error.message}`, { type: 'error' });
-        console.error(error);
       });
     },
   },

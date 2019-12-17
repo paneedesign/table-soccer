@@ -309,7 +309,6 @@ export default {
         this.gameIdToRemove = null;
       })
         .catch((error) => {
-          console.error('Error removing document: ', error);
           this.$toasted.show(`Error: ${error.message}`, { type: 'error' });
           this.gameIdToRemove = null;
         });
@@ -363,7 +362,6 @@ export default {
           });
         })
         .catch((error) => {
-          console.error('Error adding document: ', error);
           this.$toasted.show(`Error: ${error.message}`, { type: 'error' });
         })
         .finally(() => {

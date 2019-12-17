@@ -69,7 +69,6 @@ export default {
         }
       }).catch((error) => {
         this.$toasted.show(`Error: ${error.message}`, { type: 'error' });
-        console.error(error);
       });
     },
     // Google logged user -> Firebase User
@@ -110,7 +109,6 @@ export default {
         .add(data)
         .then(() => data)
         .catch((error) => {
-          console.error('Error creating player: ', error);
           this.$toasted.show(`Error: ${error.message}`, { type: 'error' });
         });
     },
