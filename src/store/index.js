@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import { firestore } from '../firebase';
 import getPlayerData from '../utils/player';
-import config from '../config';
+// import config from '../config';
 
 Vue.use(Vuex);
 
@@ -72,8 +72,8 @@ export default new Vuex.Store({
           ...ranking,
         };
       })
-      .filter(ranking => ranking.player.enabled
-          && ranking.played > config.playerRankingMinPlayedGames),
+      .filter(ranking => ranking.player.enabled),
+    /* && ranking.played > config.playerRankingMinPlayedGames */
     formatTeamRanking:
       state => site => Object.keys(state.teamsRanking[site])
         .map((rankingKey) => {
