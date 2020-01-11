@@ -11,7 +11,7 @@ const defaultRankingObject: IRankingObject = {
   rating: 1000,
 };
 
-const updatePlayerRankingWithNewGame = (ranking: IRanking, game: IGame) => {
+const updatePlayerRankingWithNewGame = (ranking, game: IGame) => {
   const redTeamRating = ranking[game.redTeam.defender.id].rating + ranking[game.redTeam.striker.id].rating;
   const blueTeamRating = ranking[game.blueTeam.defender.id].rating + ranking[game.blueTeam.striker.id].rating;
 
@@ -54,7 +54,7 @@ const updatePlayerRankingWithNewGame = (ranking: IRanking, game: IGame) => {
   return ranking;
 };
 
-const updateTeamRankingWithNewGame = (ranking: IRanking, game: IGame) => {
+const updateTeamRankingWithNewGame = (ranking, game: IGame) => {
   const redTeam = `${game.redTeam.defender.id}-${game.redTeam.striker.id}`;
   const blueTeam = `${game.blueTeam.defender.id}-${game.blueTeam.striker.id}`;
 
@@ -90,8 +90,8 @@ const updateTeamRankingWithNewGame = (ranking: IRanking, game: IGame) => {
   return ranking;
 };
 
-export const getPlayersRanking = (gamesRef: DocumentSnapshot[], site: SITES) => {
-  let ranking: IRanking = {};
+const   getPlayersRankingPerYear = (gamesRef: DocumentSnapshot[], site: SITES) => {
+  const ranking: IRanking = {};
 
   gamesRef
     .filter(gameRef => (gameRef.data() as IGame).site === site)
@@ -113,16 +113,16 @@ export const getPlayersRanking = (gamesRef: DocumentSnapshot[], site: SITES) => 
         },
       };
 
-      ranking = { ...baseRanking, ...ranking };
-
-      updatePlayerRankingWithNewGame(ranking, game);
+      const year = game.timestamp.toDate().getFullYear();
+      ranking[year] = { ...baseRanking, ...ranking[year] };
+      updatePlayerRankingWithNewGame(ranking[year], game)
     });
 
   return ranking;
 };
 
-export const getTeamsRanking = (gamesRef: DocumentSnapshot[], site: SITES) => {
-  let ranking: IRanking = {};
+const getTeamsRankingPerYear = (gamesRef: DocumentSnapshot[], site: SITES) => {
+  const ranking: IRanking = {};
 
   gamesRef
     .filter(gameRef => (gameRef.data() as IGame).site === site)
@@ -140,18 +140,52 @@ export const getTeamsRanking = (gamesRef: DocumentSnapshot[], site: SITES) => {
         },
       };
 
-      ranking = { ...baseRanking, ...ranking };
-
-      updateTeamRankingWithNewGame(ranking, game);
+      const year = game.timestamp.toDate().getFullYear();
+      ranking[year] = { ...baseRanking, ...ranking[year] };
+      updateTeamRankingWithNewGame(ranking[year], game);
     });
 
   return ranking;
 };
 
-export const updatePlayersRanking = (ranking: IRanking, game: IGame) => {
-  return updatePlayerRankingWithNewGame(ranking, game);
+const updatePlayersRanking = (ranking: IRanking, game: IGame) => {
+  const baseRanking = {
+    [game.redTeam.defender.id]: {
+      ...defaultRankingObject,
+    },
+    [game.redTeam.striker.id]: {
+      ...defaultRankingObject,
+    },
+    [game.blueTeam.defender.id]: {
+      ...defaultRankingObject,
+    },
+    [game.blueTeam.striker.id]: {
+      ...defaultRankingObject,
+    },
+  };
+
+  return updatePlayerRankingWithNewGame({ ...baseRanking, ...ranking }, game);
 };
 
-export const updateTeamsRanking = (ranking: IRanking, game: IGame) => {
-  return updateTeamRankingWithNewGame(ranking, game);
+const updateTeamsRanking = (ranking: IRanking, game: IGame) => {
+  const redTeam = `${game.redTeam.defender.id}-${game.redTeam.striker.id}`;
+  const blueTeam = `${game.blueTeam.defender.id}-${game.blueTeam.striker.id}`;
+
+  const baseRanking = {
+    [redTeam]: {
+      ...defaultRankingObject,
+    },
+    [blueTeam]: {
+      ...defaultRankingObject,
+    },
+  };
+
+  return updateTeamRankingWithNewGame({ ...baseRanking, ...ranking }, game);
 };
+
+export {
+  getPlayersRankingPerYear,
+  getTeamsRankingPerYear,
+  updatePlayersRanking,
+  updateTeamsRanking,
+}

@@ -1,10 +1,10 @@
 <template>
   <div class="ranking">
     <b-row class="align-items-center mb-4">
-      <b-col lg="9" md="6">
+      <b-col lg="6" md="6">
         <h3>Ranking</h3>
       </b-col>
-      <b-col lg="3" md="6">
+      <b-col lg="3" md="3">
         <v-select
           id="site"
           name="site"
@@ -12,14 +12,26 @@
           class="mb-3"
           :options="siteOptions"
           :clearable="false"
-          @change="siteChange"
+          @change="fetchRanking"
+          readonly></v-select>
+      </b-col>
+      <b-col lg="3" md="3">
+        <v-select
+          id="year"
+          name="year"
+          v-model="year"
+          class="mb-3"
+          :options="yearOptions"
+          :clearable="false"
+          @change="fetchRanking"
           readonly></v-select>
       </b-col>
     </b-row>
     <b-tabs content-class="mt-2">
-      <b-tab :title="`Player Ranking (${site})`" active>
+      <b-tab :title="`Player Ranking (${site} ${year})`" active>
         <b-row>
-          <b-col lg="12" v-if="$store.state.playersRanking[site]">
+          <b-col lg="12"
+                 v-if="$store.state.playersRanking[site]">
             <b-table responsive
                      striped
                      hover
@@ -56,7 +68,7 @@
           </div>
         </b-row>
       </b-tab>
-      <b-tab :title="`Team Ranking (${site})`">
+      <b-tab :title="`Team Ranking (${site} ${year})`">
         <b-row>
           <b-col lg="12" v-if="$store.state.teamsRanking[site]">
             <b-table
@@ -125,6 +137,7 @@ export default {
   data() {
     return {
       site: SITES.CATANIA,
+      year: new Date().getFullYear().toString(),
       playerSortBy: 'rating',
       playerSortDesc: true,
       playerTableFields: [
@@ -156,10 +169,18 @@ export default {
     siteOptions() {
       return Object.keys(SITES).map(site => SITES[site]);
     },
+    yearOptions() {
+      return Array(4)
+        .fill(0)
+        .map((_, i) => new Date().getFullYear() - i);
+    },
   },
   methods: {
-    siteChange(site) {
-      this.$store.dispatch('fetchRanking', site);
+    fetchRanking() {
+      this.$store.dispatch('fetchRanking', {
+        site: this.site,
+        year: this.year,
+      });
     },
   },
 };

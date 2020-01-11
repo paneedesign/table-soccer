@@ -1,7 +1,11 @@
 import SITES from './sites';
+import * as firebase from 'firebase';
+import Timestamp = firebase.firestore.Timestamp;
 
 export interface IRanking {
-  [k: string]: IRankingObject
+  [k: string]: {
+    [x: string]: IRankingObject,
+  }
 }
 
 export interface IRankingObject {
@@ -32,4 +36,5 @@ export interface IGame {
     score: number;
   },
   site: SITES;
+  timestamp: Timestamp;
 }

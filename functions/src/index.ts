@@ -2,7 +2,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import {DocumentSnapshot} from 'firebase-functions/lib/providers/firestore';
-import {fetchPlayerRankings, fetchTeamsRankings, setRankings} from './firestore/ranking';
+import {fetchPlayerRanking, fetchTeamRanking, setRankings} from './firestore/ranking';
 import {updatePlayersRanking, updateTeamsRanking} from './utils/ranking';
 import SITES from './utils/sites';
 import {IGame, IRanking} from './utils/interfaces';
@@ -21,24 +21,27 @@ exports.updateRanking = functions.firestore
     const newGame = change.after.exists ? (change.after.data() as IGame) : null;
     const oldGame = change.before.data() as IGame;
 
-    const playerRankingsRef: DocumentSnapshot[] = await fetchPlayerRankings(db);
-    const teamsRankingsRef: DocumentSnapshot[] = await fetchTeamsRankings(db);
-
     if (newGame) {
-      const { site } = newGame;
-      const playersRankingRef = playerRankingsRef.find(rankRef => rankRef.id === site);
-      const teamsRankingRef = teamsRankingsRef.find(rankRef => rankRef.id === site);
+      const { site, timestamp } = newGame;
+      const year = timestamp.toDate().getFullYear().toString();
 
-      if (playerRankingsRef) {
+      const playerRankingRef: DocumentSnapshot|undefined = await fetchPlayerRanking(db, site, year);
+      const teamRankingRef: DocumentSnapshot|undefined = await fetchTeamRanking(db, site, year);
+
+      if (playerRankingRef) {
         await db.collection('playersRanking')
           .doc(site)
-          .set(updatePlayersRanking((playersRankingRef!.data() as IRanking), newGame));
+          .collection('years')
+          .doc(year)
+          .set(updatePlayersRanking((playerRankingRef!.data() as IRanking), newGame));
       }
 
-      if (teamsRankingRef) {
+      if (teamRankingRef) {
         await db.collection('teamsRanking')
           .doc(site)
-          .set(updateTeamsRanking((teamsRankingRef!.data() as IRanking), newGame));
+          .collection('years')
+          .doc(year)
+          .set(updateTeamsRanking((teamRankingRef!.data() as IRanking), newGame));
       }
     } else if (oldGame && newGame === null) {
       const { site } = oldGame;

@@ -1,28 +1,32 @@
 import SITES from '../utils/sites';
 import fetchGames from './games';
-import { getPlayersRanking, getTeamsRanking } from '../utils/ranking';
+import { getPlayersRankingPerYear, getTeamsRankingPerYear } from '../utils/ranking';
 import * as admin from 'firebase-admin';
 import {DocumentSnapshot} from 'firebase-functions/lib/providers/firestore';
 
-export const fetchPlayerRankings = (firestore: admin.firestore.Firestore) => {
+export const fetchPlayerRanking = (firestore: admin.firestore.Firestore, site: SITES, year: string) => {
   return firestore
     .collection('playersRanking')
+    .doc(site)
+    .collection('years')
     .get()
     .then(querySnapshot => {
       const rankingsRef: DocumentSnapshot[] = [];
       querySnapshot.forEach((doc: DocumentSnapshot) => rankingsRef.push(doc));
-      return rankingsRef;
+      return rankingsRef.find(rankRef => rankRef.id === year);
     });
 };
 
-export const fetchTeamsRankings = (firestore: admin.firestore.Firestore) => {
+export const fetchTeamRanking = (firestore: admin.firestore.Firestore, site: SITES, year: string) => {
   return firestore
     .collection('teamsRanking')
+    .doc(site)
+    .collection('years')
     .get()
     .then(querySnapshot => {
       const rankingsRef: DocumentSnapshot[] = [];
       querySnapshot.forEach((doc: DocumentSnapshot) => rankingsRef.push(doc));
-      return rankingsRef;
+      return rankingsRef.find(rankRef => rankRef.id === year);
     });
 };
 
@@ -33,15 +37,25 @@ export const setRankings = async (firestore: admin.firestore.Firestore, sites: A
   const teamsRankingBatch = firestore.batch();
 
   sites.forEach((site) => {
-    playersRankingBatch.set(
-      firestore.collection('playersRanking').doc(site),
-      getPlayersRanking(gamesRef, site)
-    );
+    const playerRanking = getPlayersRankingPerYear(gamesRef, site);
+    const teamRanking = getTeamsRankingPerYear(gamesRef, site);
 
-    teamsRankingBatch.set(
-      firestore.collection('teamsRanking').doc(site),
-      getTeamsRanking(gamesRef, site)
-    );
+    Object.keys(playerRanking).forEach((year) => {
+      playersRankingBatch.set(
+        firestore.collection('playersRanking')
+          .doc(site)
+          .collection('years')
+          .doc(year),
+        playerRanking[year],
+      );
+      teamsRankingBatch.set(
+        firestore.collection('teamsRanking')
+          .doc(site)
+          .collection('years')
+          .doc(year),
+        teamRanking[year],
+      );
+    });
   });
 
   await playersRankingBatch.commit();

@@ -16,8 +16,10 @@ const mutationTypes = {
   SET_GAMES_ORDER_BY: 'SET_GAMES_ORDER_BY',
   GET_PLAYERS_RANKING_START: 'GET_PLAYERS_RANKING_START',
   GET_PLAYERS_RANKING_SUCCESS: 'GET_PLAYERS_RANKING_SUCCESS',
+  GET_PLAYERS_RANKING_ERROR: 'GET_PLAYERS_RANKING_ERROR',
   GET_TEAM_RANKING_START: 'GET_TEAM_RANKING_START',
   GET_TEAM_RANKING_SUCCESS: 'GET_TEAM_RANKING_SUCCESS',
+  GET_TEAM_RANKING_ERROR: 'GET_TEAM_RANKING_ERROR',
   SET_PLAYERS_RANKING: 'SET_PLAYERS_RANKING',
   SET_TEAM_RANKING: 'SET_TEAM_RANKING',
 };
@@ -126,6 +128,10 @@ export default new Vuex.Store({
       state.pending.playersRanking = false;
       Vue.set(state.playersRanking, site, data);
     },
+    [mutationTypes.GET_PLAYERS_RANKING_ERROR](state, site) {
+      state.pending.playersRanking = false;
+      Vue.set(state.playersRanking, site, {});
+    },
     [mutationTypes.GET_TEAM_RANKING_START](state) {
       state.pending.teamsRanking = true;
     },
@@ -133,6 +139,10 @@ export default new Vuex.Store({
       const { site, data } = payload;
       state.pending.teamsRanking = false;
       Vue.set(state.teamsRanking, site, data);
+    },
+    [mutationTypes.GET_TEAM_RANKING_ERROR](state, site) {
+      state.pending.teamsRanking = false;
+      Vue.set(state.playersRanking, site, []);
     },
   },
   actions: {
@@ -210,41 +220,51 @@ export default new Vuex.Store({
       });
       dispatch('fetchGames');
     },
-    async fetchRanking({ state, dispatch }, site) {
+    async fetchRanking({ state, dispatch }, payload) {
       if (state.playersRef.data.length === 0) {
         await dispatch('fetchPlayers');
       }
 
-      dispatch('fetchPlayerRanking', site);
-      dispatch('fetchTeamRanking', site);
+      dispatch('fetchPlayerRanking', payload);
+      dispatch('fetchTeamRanking', payload);
     },
-    fetchPlayerRanking({ commit }, site) {
+    fetchPlayerRanking({ commit }, payload) {
+      const { site, year } = payload;
       commit(mutationTypes.GET_PLAYERS_RANKING_START);
 
       firestore
         .collection('playersRanking')
         .doc(site)
+        .collection('years')
+        .doc(year.toString())
         .onSnapshot((querySnapshot) => {
           if (querySnapshot.exists) {
             commit(mutationTypes.GET_PLAYERS_RANKING_SUCCESS, {
               site,
               data: querySnapshot.data(),
             });
+          } else {
+            commit(mutationTypes.GET_PLAYERS_RANKING_ERROR, site);
           }
         });
     },
-    fetchTeamRanking({ commit }, site) {
+    fetchTeamRanking({ commit }, payload) {
+      const { site, year } = payload;
       commit(mutationTypes.GET_TEAM_RANKING_START);
 
       firestore
         .collection('teamsRanking')
         .doc(site)
+        .collection('years')
+        .doc(year.toString())
         .onSnapshot((querySnapshot) => {
           if (querySnapshot.exists) {
             commit(mutationTypes.GET_TEAM_RANKING_SUCCESS, {
               site,
               data: querySnapshot.data(),
             });
+          } else {
+            commit(mutationTypes.GET_TEAM_RANKING_ERROR, site);
           }
         });
     },
